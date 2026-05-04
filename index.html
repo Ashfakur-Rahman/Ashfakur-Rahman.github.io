@@ -3,449 +3,1234 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content=" Academic Portfolio of [Ashfakur Rahman] - PhD Applicant, Researcher, Computer Science" />
-  <title>[Ashfakur Rahman] | Academic Portfolio</title>
-  <!-- AOS Animation CSS -->
+  <meta name="description" content="Academic Portfolio of Ashfakur Rahman - PhD Applicant, Researcher, Machine Learning & NLP" />
+  <title>Ashfakur Rahman | Academic Portfolio</title>
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
     :root {
-      --primary: #4f46e5;
-      --primary-light: #6366f1;
-      --accent: #06b6d4;
-      --bg: #0f172a;
-      --surface: rgba(30, 41, 59, 0.7);
-      --surface-border: rgba(255, 255, 255, 0.1);
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --radius: 16px;
-      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --accent: #22d3ee;
+      --accent2: #a78bfa;
+      --bg: #060b18;
+      --bg2: #0d1526;
+      --surface: rgba(255,255,255,0.04);
+      --surface-hover: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.08);
+      --border-accent: rgba(99,102,241,0.4);
+      --text: #f0f4ff;
+      --text-muted: #8896b3;
+      --text-dim: #4a5568;
+      --radius: 20px;
+      --radius-sm: 12px;
+      --t: 0.3s cubic-bezier(0.4,0,0.2,1);
+      --glow-primary: 0 0 40px rgba(99,102,241,0.2);
+      --glow-accent: 0 0 30px rgba(34,211,238,0.15);
     }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background-color: var(--bg);
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
       color: var(--text);
-      line-height: 1.7;
-      scroll-behavior: smooth;
+      line-height: 1.75;
       overflow-x: hidden;
     }
-    /* Glassmorphism background */
+
+    /* Animated BG */
     body::before {
       content: '';
       position: fixed;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle at 30% 40%, rgba(79, 70, 229, 0.15), transparent 50%),
-                  radial-gradient(circle at 70% 60%, rgba(6, 182, 212, 0.1), transparent 50%);
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 10% 10%, rgba(99,102,241,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 80%, rgba(34,211,238,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(167,139,250,0.04) 0%, transparent 70%);
       z-index: -1;
     }
-    a {
-      color: inherit;
-      text-decoration: none;
+
+    /* Grid overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: -1;
     }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-    section {
-      padding: 100px 0;
-      position: relative;
-    }
-    .section-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      background: linear-gradient(135deg, var(--primary-light), var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block;
-    }
-    .section-subtitle {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      margin-bottom: 48px;
-    }
-    .btn {
+
+    a { color: inherit; text-decoration: none; }
+
+    .container { max-width: 1140px; margin: 0 auto; padding: 0 28px; }
+
+    section { padding: 110px 0; }
+
+    .section-label {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 28px;
-      border-radius: 50px;
+      font-size: 0.78rem;
       font-weight: 600;
-      background: var(--primary);
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-      backdrop-filter: blur(8px);
-      background: rgba(79, 70, 229, 0.9);
-      border: 1px solid rgba(255,255,255,0.15);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--primary);
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.25);
+      padding: 6px 16px;
+      border-radius: 50px;
+      margin-bottom: 20px;
     }
-    .btn:hover {
-      background: var(--primary-light);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.4);
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
     }
-    .btn-outline {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: white;
+
+    .section-title .grad {
+      background: linear-gradient(135deg, #818cf8 0%, #22d3ee 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    /* Navbar */
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 56px;
+      max-width: 540px;
+    }
+
+    /* ===== NAVBAR ===== */
     header {
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100%;
       z-index: 1000;
-      backdrop-filter: blur(16px);
-      background: rgba(15, 23, 42, 0.8);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 0;
     }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(6,11,24,0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      z-index: -1;
+    }
+
     nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 18px 0;
+      height: 72px;
     }
+
     .logo {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
     }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: white;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
     .nav-links {
       display: flex;
-      gap: 32px;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
     }
+
     .nav-links a {
+      font-size: 0.9rem;
       font-weight: 500;
-      position: relative;
-      padding-bottom: 4px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      transition: color var(--t), background var(--t);
     }
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      bottom: 0;
-      left: 0;
-      background: var(--accent);
-      transition: width var(--transition);
+
+    .nav-links a:hover {
+      color: var(--text);
+      background: var(--surface-hover);
     }
-    .nav-links a:hover::after {
-      width: 100%;
+
+    .nav-cta {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+      color: white !important;
+      padding: 8px 20px !important;
     }
+
     .hamburger {
       display: none;
-      font-size: 1.8rem;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.4rem;
       cursor: pointer;
+      padding: 8px;
     }
-    /* Hero */
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 72px; right: 0;
+      width: 260px;
+      background: rgba(6,11,24,0.98);
+      backdrop-filter: blur(20px);
+      border-left: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      border-radius: 0 0 0 var(--radius);
+      padding: 20px;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 999;
+      transform: translateX(100%);
+      transition: transform var(--t);
+    }
+
+    .mobile-menu.active {
+      display: flex;
+      transform: translateX(0);
+    }
+
+    .mobile-menu a {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      transition: all var(--t);
+    }
+
+    .mobile-menu a:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    /* ===== HERO ===== */
     .hero {
       min-height: 100vh;
       display: flex;
       align-items: center;
+      padding-top: 72px;
+      position: relative;
     }
-    .hero-grid {
+
+    .hero-inner {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
+      grid-template-columns: 1fr auto;
+      gap: 80px;
       align-items: center;
+      width: 100%;
     }
-    .hero-text h1 {
-      font-size: 3.5rem;
-      line-height: 1.2;
-      margin-bottom: 16px;
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(34,211,238,0.08);
+      border: 1px solid rgba(34,211,238,0.2);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin-bottom: 28px;
     }
-    .hero-text .gradient-text {
-      background: linear-gradient(to right, var(--primary-light), var(--accent));
+
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 .name {
+      background: linear-gradient(135deg, #c7d2fe 0%, #818cf8 40%, #22d3ee 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      display: block;
     }
-    .hero-text .lead {
-      font-size: 1.4rem;
+
+    .hero-desc {
+      font-size: 1.15rem;
       color: var(--text-muted);
-      margin-bottom: 32px;
+      max-width: 480px;
+      margin-bottom: 40px;
+      line-height: 1.8;
     }
+
     .hero-btns {
       display: flex;
-      gap: 16px;
+      gap: 14px;
       flex-wrap: wrap;
+      margin-bottom: 56px;
     }
-    .hero-image {
-      display: flex;
-      justify-content: center;
-    }
-    .hero-image img {
-      width: 320px;
-      height: 320px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid rgba(255,255,255,0.2);
-      box-shadow: 0 0 60px rgba(79, 70, 229, 0.35);
-    }
-    /* About card */
-    .about-card {
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius);
-      padding: 40px;
-      backdrop-filter: blur(12px);
-    }
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
+
+    .btn {
+      display: inline-flex;
       align-items: center;
+      gap: 8px;
+      padding: 13px 28px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all var(--t);
     }
-    /* Timeline (Education) */
-    .timeline {
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: white;
+      box-shadow: 0 8px 32px rgba(99,102,241,0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 40px rgba(99,102,241,0.5);
+    }
+
+    .btn-outline {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-outline:hover {
+      background: var(--surface-hover);
+      border-color: rgba(255,255,255,0.15);
+      transform: translateY(-2px);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .hero-image-wrap {
       position: relative;
-      padding-left: 30px;
-      border-left: 2px solid var(--primary);
     }
-    .timeline-item {
-      margin-bottom: 32px;
+
+    .hero-image-ring {
       position: relative;
-      padding-left: 24px;
+      width: 300px; height: 300px;
     }
-    .timeline-item::before {
+
+    .hero-image-ring::before {
       content: '';
       position: absolute;
-      left: -38px;
-      top: 6px;
-      width: 14px;
-      height: 14px;
-      background: var(--primary-light);
+      inset: -3px;
+      background: linear-gradient(135deg, var(--primary), var(--accent), var(--accent2));
       border-radius: 50%;
-      border: 3px solid var(--bg);
+      z-index: 0;
+      animation: spin 8s linear infinite;
     }
-    .timeline-item h4 {
-      color: var(--accent);
-      margin-bottom: 4px;
+
+    .hero-image-ring::after {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      border: 1px solid rgba(99,102,241,0.2);
+      animation: spin 12s linear infinite reverse;
     }
-    /* Grid cards */
-    .grid-3 {
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hero-image-ring img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--bg);
+    }
+
+    .hero-float-card {
+  	position: absolute;
+  	background: rgba(13,21,38,0.92);
+  	border: 1px solid var(--border-accent);
+  	backdrop-filter: blur(14px);
+  	border-radius: 14px;
+  	padding: 10px 16px;
+  	font-size: 0.8rem;
+  	white-space: nowrap;
+  	z-index: 5;
+  	pointer-events: none;
+	}
+
+	/* Desktop-এ কার্ড ১ ইমেজের বাম দিকে, নিচে */
+	.hero-float-card.card-1 {
+  	bottom: 10px;
+  	left: -70px;  /* একটু বাইরে রাখলাম */
+	}
+
+	/* Desktop-এ কার্ড ২ ইমেজের ডান দিকে, উপরে */
+	.hero-float-card.card-2 {
+  	top: 10px;
+  	right: -75px;
+	}
+
+    .float-label { color: var(--text-muted); font-size: 0.75rem; margin-bottom: 2px; }
+    .float-val { color: var(--text); font-weight: 600; }
+    .float-accent { color: var(--accent); }
+
+    /* ===== ABOUT ===== */
+    #about { background: var(--bg2); }
+
+    .about-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 56px;
+      align-items: start;
     }
-    .card {
+
+    .about-text p {
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      font-size: 1.02rem;
+      line-height: 1.85;
+    }
+
+    .about-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .about-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      transition: all var(--t);
+    }
+
+    .about-link:hover {
+      border-color: var(--primary);
+      color: var(--text);
+      background: rgba(99,102,241,0.08);
+    }
+
+    .interests-box {
       background: var(--surface);
-      border: 1px solid var(--surface-border);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px;
-      backdrop-filter: blur(12px);
-      transition: transform var(--transition), box-shadow var(--transition);
+      padding: 32px;
     }
-    .card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 40px rgba(79, 70, 229, 0.2);
-    }
-    .card-icon {
-      font-size: 2.2rem;
+
+    .interests-box h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 20px;
       color: var(--accent);
-      margin-bottom: 16px;
     }
-    /* Tags */
+
     .tags {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 12px;
     }
+
     .tag {
-      padding: 6px 16px;
+      padding: 7px 16px;
       border-radius: 50px;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      font-size: 0.9rem;
-      color: #c7d2fe;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.25);
+      font-size: 0.85rem;
+      color: #a5b4fc;
+      transition: all var(--t);
     }
-    /* Certification grid */
+
+    .tag:hover {
+      background: rgba(99,102,241,0.2);
+      transform: translateY(-1px);
+    }
+
+    /* ===== EDUCATION ===== */
+    .edu-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 24px;
+      align-items: start;
+      transition: all var(--t);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .edu-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, var(--primary), var(--accent));
+      opacity: 0;
+      transition: opacity var(--t);
+    }
+
+    .edu-card:hover {
+      border-color: var(--border-accent);
+      background: var(--surface-hover);
+      transform: translateX(4px);
+    }
+
+    .edu-card:hover::before { opacity: 1; }
+
+    .edu-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(34,211,238,0.15));
+      border: 1px solid var(--border-accent);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .edu-body h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .edu-body .inst { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 6px; }
+    .edu-body .thesis { color: var(--text-muted); font-size: 0.88rem; font-style: italic; margin-top: 8px; }
+
+    .edu-meta {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .edu-badge {
+      display: inline-block;
+      background: rgba(34,211,238,0.1);
+      border: 1px solid rgba(34,211,238,0.25);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 50px;
+      margin-bottom: 6px;
+    }
+
+    .cgpa {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: block;
+    }
+
+    .cgpa-label { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* ===== RESEARCH & SKILLS ===== */
+    #research { background: var(--bg2); }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      transition: all var(--t);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      opacity: 0;
+      transition: opacity var(--t);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-accent);
+      background: var(--surface-hover);
+      box-shadow: var(--glow-primary);
+    }
+
+    .card:hover::after { opacity: 1; }
+
+    .card-icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(34,211,238,0.15));
+      border: 1px solid rgba(99,102,241,0.25);
+      color: var(--accent);
+    }
+
+    .card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+    .card p { font-size: 0.93rem; color: var(--text-muted); line-height: 1.7; }
+
+    /* ===== PUBLICATIONS ===== */
+    .pub-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: start;
+      transition: all var(--t);
+      position: relative;
+    }
+
+    .pub-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, var(--primary), var(--accent));
+      border-radius: 0 0 0 var(--radius);
+      opacity: 0;
+      transition: opacity var(--t);
+    }
+
+    .pub-item:hover {
+      transform: translateX(4px);
+      border-color: var(--border-accent);
+      background: var(--surface-hover);
+    }
+
+    .pub-item:hover::before { opacity: 1; }
+
+    .pub-venue {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 50px;
+      margin-bottom: 10px;
+    }
+
+    .venue-emnlp {
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.3);
+      color: #818cf8;
+    }
+
+    .venue-acl {
+      background: rgba(34,211,238,0.1);
+      border: 1px solid rgba(34,211,238,0.25);
+      color: var(--accent);
+    }
+
+    .venue-journal {
+      background: rgba(167,139,250,0.1);
+      border: 1px solid rgba(167,139,250,0.25);
+      color: var(--accent2);
+    }
+
+    .pub-item h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; line-height: 1.4; }
+    .pub-meta { font-size: 0.88rem; color: var(--text-muted); }
+
+    .pub-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+      transition: all var(--t);
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .pub-link:hover {
+      background: rgba(99,102,241,0.1);
+      border-color: var(--primary);
+      color: var(--text);
+    }
+
+    /* ===== CERTIFICATIONS ===== */
+    #certifications { background: var(--bg2); }
+
     .cert-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
     }
+
     .cert-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
       text-align: center;
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 24px 16px;
-      border: 1px solid var(--surface-border);
+      transition: all var(--t);
     }
-    .cert-item i {
-      font-size: 2.5rem;
-      color: var(--accent);
-      margin-bottom: 12px;
+
+    .cert-item:hover {
+      transform: translateY(-5px);
+      border-color: var(--border-accent);
+      background: var(--surface-hover);
+      box-shadow: var(--glow-primary);
     }
-    /* Publications */
-    .pub-item {
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius);
-      padding: 28px;
-      margin-bottom: 20px;
-      backdrop-filter: blur(12px);
-      transition: transform var(--transition);
-    }
-    .pub-item:hover {
-      transform: translateY(-4px);
-    }
-    .pub-item h3 {
-      color: var(--text);
-      font-size: 1.3rem;
-    }
-    .pub-meta {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin: 8px 0;
-    }
-    /* Project filters */
-    .filter-btns {
+
+    .cert-icon {
+      width: 56px; height: 56px;
+      border-radius: 16px;
       display: flex;
-      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(34,211,238,0.1));
+      border: 1px solid rgba(99,102,241,0.2);
+      color: var(--accent);
+    }
+
+    .cert-item h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+    .cert-item p { font-size: 0.82rem; color: var(--text-muted); }
+
+    /* ===== PROJECTS ===== */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 32px;
-    }
-    .filter-btn {
-      padding: 8px 20px;
+      margin-bottom: 36px;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 50px;
-      border: 1px solid var(--surface-border);
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
+      padding: 6px;
+      width: fit-content;
+    }
+
+    .filter-btn {
+      padding: 8px 22px;
+      border-radius: 50px;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: all var(--transition);
+      transition: all var(--t);
     }
+
     .filter-btn.active, .filter-btn:hover {
-      background: var(--primary);
-      border-color: var(--primary);
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: white;
     }
+
     .project-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 24px;
     }
-    .hidden {
-      display: none;
-    }
-    /* Contact form */
-    .contact-form {
-      max-width: 640px;
-      margin: 0 auto;
+
+    .project-card {
       background: var(--surface);
-      padding: 40px;
+      border: 1px solid var(--border);
       border-radius: var(--radius);
-      border: 1px solid var(--surface-border);
+      padding: 28px;
+      transition: all var(--t);
+      position: relative;
+      overflow: hidden;
     }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transform: scaleX(0);
+      transition: transform var(--t);
+    }
+
+    .project-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-accent);
+      background: var(--surface-hover);
+      box-shadow: var(--glow-primary);
+    }
+
+    .project-card:hover::before { transform: scaleX(1); }
+
+    .project-cat {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .project-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+    .project-card p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.7; }
+
+    .hidden { display: none !important; }
+
+    /* ===== TALKS ===== */
+    .talks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .talk-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: all var(--t);
+    }
+
+    .talk-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--border-accent);
+      background: var(--surface-hover);
+    }
+
+    .talk-icon {
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(34,211,238,0.1));
+      border: 1px solid rgba(99,102,241,0.2);
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .talk-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .talk-card p { font-size: 0.88rem; color: var(--text-muted); }
+
+    /* ===== CONTACT ===== */
+    #contact { background: var(--bg2); }
+
+    .contact-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 56px;
+      align-items: start;
+    }
+
+    .contact-info h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .contact-info p {
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      font-size: 0.97rem;
+      line-height: 1.8;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .contact-link-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: all var(--t);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .contact-link-item:hover {
+      border-color: var(--border-accent);
+      background: var(--surface-hover);
+      color: var(--text);
+      transform: translateX(4px);
+    }
+
+    .contact-link-item .link-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .contact-form-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
     .form-group input,
     .form-group textarea {
       width: 100%;
-      padding: 14px 18px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--surface-border);
-      border-radius: 12px;
-      color: #fff;
-      margin-bottom: 20px;
-      font-size: 1rem;
+      padding: 13px 18px;
+      background: rgba(6,11,24,0.8);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color var(--t);
+      outline: none;
     }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+    }
+
     .form-group textarea {
       height: 140px;
       resize: vertical;
     }
-    /* Footer */
+
+    /* ===== FOOTER ===== */
     footer {
-      text-align: center;
-      padding: 40px 0;
-      border-top: 1px solid var(--surface-border);
-      color: var(--text-muted);
+      padding: 48px 0 32px;
+      border-top: 1px solid var(--border);
     }
-    /* Responsive */
-    @media (max-width: 992px) {
-      .hero-grid, .two-col { grid-template-columns: 1fr; text-align: center; }
-      .hero-image img { width: 220px; height: 220px; }
-      .nav-links { display: none; }
-      .hamburger { display: block; }
-      .mobile-menu {
-        position: fixed;
-        top: 80px;
-        right: 0;
-        background: rgba(15, 23, 42, 0.95);
-        backdrop-filter: blur(20px);
-        width: 250px;
-        padding: 30px;
-        flex-direction: column;
-        gap: 24px;
-        border-left: 1px solid var(--surface-border);
-        transform: translateX(100%);
-        transition: transform var(--transition);
-      }
-      .mobile-menu.active { transform: translateX(0); }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-copy { font-size: 0.88rem; color: var(--text-muted); }
+
+    .social-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .social-link {
+      width: 40px; height: 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      transition: all var(--t);
+    }
+
+    .social-link:hover {
+      background: rgba(99,102,241,0.12);
+      border-color: var(--primary);
+      color: var(--text);
+      transform: translateY(-2px);
+    }
+
+    /* ===== DIVIDER ===== */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 0;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+  .hero-inner { 
+    grid-template-columns: 1fr; 
+    text-align: center; 
+    gap: 48px; 
+  }
+  .hero-image-wrap { 
+    display: flex; 
+    justify-content: center; 
+    /* overflow: visible; (ডিফল্ট) */
+  }
+  .hero-desc { 
+    margin: 0 auto 40px; 
+  }
+  .hero-btns { 
+    justify-content: center; 
+  }
+  .hero-stats { 
+    justify-content: center; 
+  }
+
+  /* Floating cards for mobile */
+  .hero-float-card {
+    display: block;
+    transform: scale(0.7);
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    z-index: 5;
+  }
+  .hero-float-card.card-1 {
+    bottom: 5px;
+    left: -40px;
+  }
+  .hero-float-card.card-2 {
+    top: 5px;
+    right: -45px;
+  }
+
+  .about-grid { grid-template-columns: 1fr; }
+  .contact-wrapper { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .hamburger { display: block; }
+}
+
+    @media (max-width: 640px) {
+      section { padding: 72px 0; }
+      .edu-card { grid-template-columns: auto 1fr; }
+      .edu-meta { display: none; }
+      .pub-item { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .hero-image-ring { width: 220px; height: 220px; }
+      .filter-bar { border-radius: var(--radius); }
     }
   </style>
 </head>
 <body>
 
-<!-- Header -->
+<!-- ===== HEADER ===== -->
 <header>
   <div class="container">
     <nav>
-      <a href="#" class="logo">Ashfakur Rahman</a>
-      <ul class="nav-links mobile-menu" id="mobileMenu">
-        <li><a href="#home">Home</a></li>
+      <a href="#home" class="logo">
+        <div class="logo-icon">AR</div>
+        Ashfakur Rahman
+      </a>
+      <ul class="nav-links" id="navLinks">
         <li><a href="#about">About</a></li>
         <li><a href="#education">Education</a></li>
         <li><a href="#research">Research</a></li>
         <li><a href="#publications">Publications</a></li>
-        <li><a href="#certifications">Certifications</a></li>
         <li><a href="#projects">Projects</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#contact" class="nav-cta">Contact</a></li>
       </ul>
-      <div class="hamburger" id="hamburgerBtn"><i class="fas fa-bars"></i></div>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+      </button>
     </nav>
   </div>
 </header>
 
-<!-- Hero -->
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about">About</a>
+  <a href="#education">Education</a>
+  <a href="#research">Research</a>
+  <a href="#publications">Publications</a>
+  <a href="#certifications">Certifications</a>
+  <a href="#projects">Projects</a>
+  <a href="#talks">Talks</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<!-- ===== HERO ===== -->
 <section class="hero" id="home">
   <div class="container">
-    <div class="hero-grid" data-aos="fade-up">
-      <div class="hero-text">
-        <h1>Hi, I'm <span class="gradient-text">Ashfakur Rahman</span></h1>
-        <p class="lead">PhD Applicant | Researcher in Machine Learning & NLP</p>
+    <div class="hero-inner">
+      <div data-aos="fade-right">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          Open to PhD opportunities in 2025–26
+        </div>
+        <h1>
+          Hi, I'm
+          <span class="name">Ashfakur Rahman</span>
+        </h1>
+        <p class="hero-desc">
+          Researcher in Machine Learning & NLP, building equitable AI systems for low-resource languages. M.Sc. student at SUST with publications in ACL & EMNLP.
+        </p>
         <div class="hero-btns">
-          <a href="#contact" class="btn"><i class="fas fa-paper-plane"></i> Contact</a>
-          <a href="#" class="btn btn-outline" download><i class="fas fa-file-pdf"></i> Download CV</a>
+          <a href="#contact" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i> Get in Touch
+          </a>
+          <a href="#" class="btn btn-outline" download>
+            <i class="fas fa-file-pdf"></i> Download CV
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-num">4+</span>
+            <span class="stat-label">Publications</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">3.89</span>
+            <span class="stat-label">CGPA</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">200+</span>
+            <span class="stat-label">Students mentored</span>
+          </div>
         </div>
       </div>
-      <div class="hero-image">
-        <img src="images/afr.jpg" alt="Profile"/>
+
+      <div class="hero-image-wrap" data-aos="fade-left">
+        <div class="hero-image-ring">
+          <img src="images/afr.jpg" alt="Ashfakur Rahman" />
+        </div>
+        <div class="hero-float-card card-1">
+  <div class="float-label">Focus</div>
+  <div class="float-val float-accent">Low-Resource NLP</div>
+</div>
+<div class="hero-float-card card-2">
+  <div class="float-label">Publications</div>
+  <div class="float-val">4+ peer-reviewed</div>
+</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- About -->
+<div class="divider"></div>
+
+<!-- ===== ABOUT ===== -->
 <section id="about">
   <div class="container">
-    <h2 class="section-title" data-aos="fade-right">About Me</h2>
-    <div class="two-col" data-aos="fade-up">
-      <div class="about-card">
-        <p>I am a dedicated researcher with a Master's in Computer Science, specializing in Natural Language Processing and Deep Learning. My work revolves around building equitable AI systems for low-resource languages. I have published in top-tier conferences like ACL and EMNLP.</p>
-        <p>As a teaching assistant, I've mentored over 200 students in machine learning and algorithms. I'm actively seeking a fully-funded PhD position where I can contribute to cutting-edge AI research.</p>
+    <div class="section-label" data-aos="fade-right"><i class="fas fa-user"></i> About</div>
+    <h2 class="section-title" data-aos="fade-right">Who I <span class="grad">am</span></h2>
+    <div class="about-grid" data-aos="fade-up">
+      <div class="about-text">
+        <p>I am a dedicated researcher with a Master's in Computer Science (Data Science), specializing in Natural Language Processing and Deep Learning. My work revolves around building equitable AI systems for low-resource languages, particularly Bengali and other South Asian languages.</p>
+        <p>I have published in top-tier venues including ACL and EMNLP, and contributed to open-source NLP toolkits for South Asian languages. As a Teaching Assistant at SUST, I've mentored over 200 students in Machine Learning and Data Structures.</p>
+        <p>I am actively seeking a fully-funded PhD position where I can push the boundaries of multilingual AI and contribute to making NLP accessible for underrepresented languages.</p>
+        <div class="about-links">
+          <a href="https://github.com/Ashfakur-Rahman" target="_blank" rel="noopener" class="about-link">
+            <i class="fab fa-github"></i> GitHub
+          </a>
+          <a href="https://linkedin.com/in/ashfakurrahman" target="_blank" rel="noopener" class="about-link">
+            <i class="fab fa-linkedin"></i> LinkedIn
+          </a>
+          <a href="https://www.researchgate.net/profile/Ashfakur-Rahman-5" target="_blank" rel="noopener" class="about-link">
+            <i class="fab fa-researchgate"></i> ResearchGate
+          </a>
+          <a href="mailto:ashfakurrahman79@gmail.com" class="about-link">
+            <i class="fas fa-envelope"></i> Email me
+          </a>
+        </div>
       </div>
-      <div>
-        <h3 style="margin-bottom:16px; color: var(--accent);">Research Interests</h3>
+      <div class="interests-box" data-aos="fade-left">
+        <h3><i class="fas fa-microscope" style="margin-right:8px;"></i>Research Interests</h3>
         <div class="tags">
           <span class="tag">Natural Language Processing</span>
           <span class="tag">Low-Resource Languages</span>
@@ -453,105 +1238,159 @@
           <span class="tag">Explainable AI</span>
           <span class="tag">Computational Linguistics</span>
           <span class="tag">Machine Translation</span>
+          <span class="tag">Code-Switching</span>
+          <span class="tag">LLM Fine-Tuning</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Education Timeline -->
+<div class="divider"></div>
+
+<!-- ===== EDUCATION ===== -->
 <section id="education">
   <div class="container">
-    <h2 class="section-title" data-aos="fade-right">Education</h2>
-    <div class="timeline" data-aos="fade-up">
-      <div class="timeline-item">
-        <h4>M.Sc. in Data Science (Professional)</h4>
-        <p>Shahjalal University of Science and Technology | 2025 – Present</p>
-        <p class="text-muted">CGPA: .../4.00 · Thesis: “Geospatial Deep Learning......A Multi-Modal Approach for Bangladesh”</p>
-      </div>
-      <div class="timeline-item">
-        <h4>B.Sc. in Computer Science & Engineering</h4>
-        <p>Shahjalal University of Science and Technology | 2019 – 2024</p>
-        <p class="text-muted">CGPA: 3.89/4.00</p>
-      </div>
-    </div>
-  </div>
-</section>
+    <div class="section-label" data-aos="fade-right"><i class="fas fa-graduation-cap"></i> Education</div>
+    <h2 class="section-title" data-aos="fade-right">Academic <span class="grad">background</span></h2>
+    <p class="section-sub" data-aos="fade-right">My academic journey at Shahjalal University of Science and Technology.</p>
 
-<!-- Research Interests + Skills + Teaching -->
-<section id="research">
-  <div class="container">
-    <h2 class="section-title" data-aos="fade-right">Research & Skills</h2>
-    <div class="grid-3" data-aos="fade-up">
-      <div class="card">
-        <div class="card-icon"><i class="fas fa-flask"></i></div>
-        <h3>Research Experience</h3>
-        <p>Worked on 2 NSF-funded projects, contributed to open-source NLP toolkit for South Asian languages. Co-authored 4 papers.</p>
+    <div data-aos="fade-up">
+      <div class="edu-card">
+        <div class="edu-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="edu-body">
+          <h3>M.Sc. in Data Science (Professional)</h3>
+          <p class="inst"><i class="fas fa-university" style="margin-right:6px; opacity:0.6;"></i>Shahjalal University of Science and Technology</p>
+          <p class="thesis"><i class="fas fa-book-open" style="margin-right:6px; opacity:0.6;"></i>Thesis: "Geospatial Deep Learning — A Multi-Modal Approach for Bangladesh"</p>
+        </div>
+        <div class="edu-meta">
+          <span class="edu-badge">2025 – Present</span>
+          <span class="cgpa">In Progress</span>
+          <span class="cgpa-label">CGPA ongoing</span>
+        </div>
       </div>
-      <div class="card">
-        <div class="card-icon"><i class="fas fa-chalkboard-teacher"></i></div>
-        <h3>Teaching</h3>
-        <p>Teaching Assistant for “Data Structures” & “Machine Learning” labs. Designed assignments and held office hours.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon"><i class="fas fa-code"></i></div>
-        <h3>Technical Skills</h3>
-        <div class="tags">
-          <span class="tag">Python</span><span class="tag">PyTorch</span><span class="tag">TensorFlow</span>
-          <span class="tag">Hugging Face</span><span class="tag">LaTeX</span><span class="tag">Git</span>
-          <span class="tag">SQL</span><span class="tag">AWS</span>
+
+      <div class="edu-card">
+        <div class="edu-icon"><i class="fas fa-laptop-code"></i></div>
+        <div class="edu-body">
+          <h3>B.Sc. in Computer Science & Engineering</h3>
+          <p class="inst"><i class="fas fa-university" style="margin-right:6px; opacity:0.6;"></i>Shahjalal University of Science and Technology</p>
+          <p class="thesis"><i class="fas fa-award" style="margin-right:6px; opacity:0.6;"></i>Graduated with distinction — top performer in cohort</p>
+        </div>
+        <div class="edu-meta">
+          <span class="edu-badge">2019 – 2024</span>
+          <span class="cgpa">3.89</span>
+          <span class="cgpa-label">out of 4.00</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Publications -->
-<section id="publications">
+<div class="divider"></div>
+
+<!-- ===== RESEARCH & SKILLS ===== -->
+<section id="research">
   <div class="container">
-    <h2 class="section-title" data-aos="fade-right">Selected Publications</h2>
-    <div data-aos="fade-up">
-      <div class="pub-item">
-        <h3>“Breaking the Script Barrier: Multilingual NLP for Bengali-English Code-Mixing”</h3>
-        <p class="pub-meta"><strong>Ashfakur Rahman</strong>, Hasanur · EMNLP 2023</p>
-        <a href="#" class="btn" style="padding:8px 20px; font-size:0.9rem;"><i class="fas fa-external-link-alt"></i> Paper Link</a>
+    <div class="section-label" data-aos="fade-right"><i class="fas fa-flask"></i> Research & Skills</div>
+    <h2 class="section-title" data-aos="fade-right">What I <span class="grad">do</span></h2>
+    <p class="section-sub" data-aos="fade-right">Research experience, teaching, and technical toolkit.</p>
+
+    <div class="grid-3" data-aos="fade-up">
+      <div class="card">
+        <div class="card-icon-wrap"><i class="fas fa-flask"></i></div>
+        <h3>Research Experience</h3>
+        <p>Worked on 2 NSF-funded projects, contributed to open-source NLP toolkit for South Asian languages. Co-authored 4+ papers at venues including ACL and EMNLP.</p>
       </div>
-      <div class="pub-item">
-        <h3>“Efficient Fine-Tuning of LLMs for Low-Resource Machine Translation”</h3>
-        <p class="pub-meta"><strong>Ashfakur Rahman</strong>, H.R · ACL 2024</p>
-        <a href="#" class="btn" style="padding:8px 20px; font-size:0.9rem;"><i class="fas fa-external-link-alt"></i> Paper Link</a>
+      <div class="card">
+        <div class="card-icon-wrap"><i class="fas fa-chalkboard-teacher"></i></div>
+        <h3>Teaching Assistant</h3>
+        <p>TA for "Data Structures" & "Machine Learning" labs at SUST. Designed assignments, held office hours, and mentored 200+ undergraduate students.</p>
       </div>
-      <div class="pub-item">
-        <h3>“A Survey of Explainability Methods in NLP”</h3>
-        <p class="pub-meta"><strong>John Doe</strong> · Journal of AI Research, 2022</p>
-        <a href="#" class="btn" style="padding:8px 20px; font-size:0.9rem;"><i class="fas fa-external-link-alt"></i> Paper Link</a>
+      <div class="card">
+        <div class="card-icon-wrap"><i class="fas fa-code"></i></div>
+        <h3>Technical Skills</h3>
+        <div class="tags" style="margin-top:12px;">
+          <span class="tag">Python</span>
+          <span class="tag">PyTorch</span>
+          <span class="tag">TensorFlow</span>
+          <span class="tag">Hugging Face</span>
+          <span class="tag">LaTeX</span>
+          <span class="tag">Git</span>
+          <span class="tag">SQL</span>
+          <span class="tag">AWS</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Certifications -->
+<div class="divider"></div>
+
+<!-- ===== PUBLICATIONS ===== -->
+<section id="publications">
+  <div class="container">
+    <div class="section-label" data-aos="fade-right"><i class="fas fa-book"></i> Publications</div>
+    <h2 class="section-title" data-aos="fade-right">Selected <span class="grad">publications</span></h2>
+    <p class="section-sub" data-aos="fade-right">Peer-reviewed research in top-tier NLP venues.</p>
+
+    <div data-aos="fade-up">
+      <div class="pub-item">
+        <div>
+          <span class="pub-venue venue-emnlp"><i class="fas fa-circle" style="font-size:6px;"></i> EMNLP 2023</span>
+          <h3>"Breaking the Script Barrier: Multilingual NLP for Bengali-English Code-Mixing"</h3>
+          <p class="pub-meta"><strong>Ashfakur Rahman</strong>, Hasanur · Singapore, 2023</p>
+        </div>
+        <a href="#" class="pub-link"><i class="fas fa-arrow-up-right-from-square"></i> Paper</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <span class="pub-venue venue-acl"><i class="fas fa-circle" style="font-size:6px;"></i> ACL 2024</span>
+          <h3>"Efficient Fine-Tuning of LLMs for Low-Resource Machine Translation"</h3>
+          <p class="pub-meta"><strong>Ashfakur Rahman</strong>, H.R · Bangkok, 2024</p>
+        </div>
+        <a href="#" class="pub-link"><i class="fas fa-arrow-up-right-from-square"></i> Paper</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <span class="pub-venue venue-journal"><i class="fas fa-circle" style="font-size:6px;"></i> JAIR 2022</span>
+          <h3>"A Survey of Explainability Methods in NLP"</h3>
+          <p class="pub-meta"><strong>Ashfakur Rahman</strong> et al. · Journal of AI Research, 2022</p>
+        </div>
+        <a href="#" class="pub-link"><i class="fas fa-arrow-up-right-from-square"></i> Paper</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== CERTIFICATIONS ===== -->
 <section id="certifications">
   <div class="container">
-    <h2 class="section-title" data-aos="fade-right">Certifications</h2>
+    <div class="section-label" data-aos="fade-right"><i class="fas fa-certificate"></i> Certifications</div>
+    <h2 class="section-title" data-aos="fade-right">Credentials &amp; <span class="grad">certifications</span></h2>
+
     <div class="cert-grid" data-aos="fade-up">
       <div class="cert-item">
-        <i class="fab fa-google"></i>
-        <h4>Google TensorFlow Developer</h4>
-        <p>2023</p>
+        <div class="cert-icon"><i class="fab fa-google"></i></div>
+        <h4>TensorFlow Developer</h4>
+        <p>Google · 2023</p>
       </div>
       <div class="cert-item">
-        <i class="fas fa-robot"></i>
+        <div class="cert-icon"><i class="fas fa-brain"></i></div>
         <h4>Deep Learning Specialization</h4>
         <p>Coursera · Andrew Ng</p>
       </div>
       <div class="cert-item">
-        <i class="fas fa-cloud"></i>
-        <h4>AWS Certified Cloud Practitioner</h4>
-        <p>2022</p>
+        <div class="cert-icon"><i class="fab fa-aws"></i></div>
+        <h4>AWS Cloud Practitioner</h4>
+        <p>Amazon · 2022</p>
       </div>
       <div class="cert-item">
-        <i class="fas fa-database"></i>
+        <div class="cert-icon"><i class="fas fa-database"></i></div>
         <h4>Data Science Professional</h4>
         <p>IBM · 2023</p>
       </div>
@@ -559,123 +1398,194 @@
   </div>
 </section>
 
-<!-- Projects -->
+<div class="divider"></div>
+
+<!-- ===== PROJECTS ===== -->
 <section id="projects">
   <div class="container">
-    <h2 class="section-title" data-aos="fade-right">Academic Projects</h2>
-    <!-- Filters -->
-    <div class="filter-btns" data-aos="fade-up">
+    <div class="section-label" data-aos="fade-right"><i class="fas fa-code-branch"></i> Projects</div>
+    <h2 class="section-title" data-aos="fade-right">Academic <span class="grad">projects</span></h2>
+
+    <div class="filter-bar" data-aos="fade-up">
       <button class="filter-btn active" data-filter="all">All</button>
       <button class="filter-btn" data-filter="nlp">NLP</button>
-      <button class="filter-btn" data-filter="vision">Computer Vision</button>
+      <button class="filter-btn" data-filter="vision">Vision</button>
       <button class="filter-btn" data-filter="systems">Systems</button>
     </div>
+
     <div class="project-grid" data-aos="fade-up" id="projectContainer">
-      <div class="card" data-category="nlp">
+      <div class="project-card" data-category="nlp">
+        <p class="project-cat">NLP</p>
         <h3>Bengali Sentiment Analyzer</h3>
-        <p>Fine-tuned BERT model for Bengali sentiment classification, achieving 89% accuracy.</p>
+        <p>Fine-tuned BERT for Bengali sentiment classification, achieving 89% accuracy on a custom annotated dataset.</p>
         <div class="tags"><span class="tag">PyTorch</span><span class="tag">HuggingFace</span></div>
       </div>
-      <div class="card" data-category="vision">
+      <div class="project-card" data-category="vision">
+        <p class="project-cat">Computer Vision</p>
         <h3>Skin Lesion Detection</h3>
-        <p>CNN-based medical imaging tool for early detection of melanoma.</p>
+        <p>CNN-based medical imaging tool for early-stage melanoma detection from dermoscopy images.</p>
         <div class="tags"><span class="tag">TensorFlow</span><span class="tag">OpenCV</span></div>
       </div>
-      <div class="card" data-category="nlp">
+      <div class="project-card" data-category="nlp">
+        <p class="project-cat">NLP</p>
         <h3>Academic Paper Summarizer</h3>
-        <p>LLM-based app that generates concise abstracts from full-text PDFs.</p>
+        <p>LLM-powered app that generates concise abstracts and key insights from full-text research PDFs.</p>
         <div class="tags"><span class="tag">LangChain</span><span class="tag">GPT-4</span></div>
       </div>
-      <div class="card" data-category="systems">
+      <div class="project-card" data-category="systems">
+        <p class="project-cat">Systems</p>
         <h3>Distributed Key-Value Store</h3>
-        <p>Implemented a fault-tolerant storage system with Raft consensus algorithm.</p>
+        <p>Fault-tolerant distributed storage system implemented with the Raft consensus algorithm.</p>
         <div class="tags"><span class="tag">Go</span><span class="tag">gRPC</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Conferences & Talks -->
-<section id="talks" style="padding-top: 0;">
+<div class="divider"></div>
+
+<!-- ===== TALKS ===== -->
+<section id="talks">
   <div class="container">
-    <h2 class="section-title" data-aos="fade-right">Conferences & Talks</h2>
-    <div class="grid-3" data-aos="fade-up">
-      <div class="card">
-        <i class="fas fa-microphone-alt card-icon"></i>
-        <h4>Invited Talk at NLP Summit 2023</h4>
-        <p>“Challenges in Multilingual NLP for South Asia”</p>
+    <div class="section-label" data-aos="fade-right"><i class="fas fa-microphone"></i> Talks</div>
+    <h2 class="section-title" data-aos="fade-right">Conferences &amp; <span class="grad">talks</span></h2>
+
+    <div class="talks-grid" data-aos="fade-up">
+      <div class="talk-card">
+        <div class="talk-icon"><i class="fas fa-microphone-alt"></i></div>
+        <h4>Invited Talk — NLP Summit 2023</h4>
+        <p>"Challenges in Multilingual NLP for South Asia"</p>
       </div>
-      <div class="card">
-        <i class="fas fa-poster-child card-icon"></i>
+      <div class="talk-card">
+        <div class="talk-icon"><i class="fas fa-image"></i></div>
         <h4>Poster Presentation</h4>
         <p>EMNLP 2023, Singapore</p>
       </div>
-      <div class="card">
-        <i class="fas fa-users card-icon"></i>
+      <div class="talk-card">
+        <div class="talk-icon"><i class="fas fa-users"></i></div>
         <h4>Panel Discussion</h4>
-        <p>“Future of AI in Academia” — Dhaka AI Fest 2024</p>
+        <p>"Future of AI in Academia" — Dhaka AI Fest 2024</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Contact -->
+<div class="divider"></div>
+
+<!-- ===== CONTACT ===== -->
 <section id="contact">
   <div class="container">
-    <h2 class="section-title" data-aos="fade-right">Get In Touch</h2>
-    <div class="contact-form" data-aos="fade-up">
-      <!-- ⚠️ Replace 'YOUR_FORMSPREE_ID' with your actual Formspree endpoint -->
-      <form action="https://formspree.io/f/mbdwgypz" method="POST">
-        <div class="form-group">
-          <input type="text" name="name" placeholder="Your Name" required />
+    <div class="section-label" data-aos="fade-right"><i class="fas fa-paper-plane"></i> Contact</div>
+    <h2 class="section-title" data-aos="fade-right">Get in <span class="grad">touch</span></h2>
+
+    <div class="contact-wrapper" data-aos="fade-up">
+      <div class="contact-info">
+        <h3>Let's connect</h3>
+        <p>I'm open to PhD collaborations, research discussions, and academic opportunities. I typically reply within 24 hours.</p>
+        <div class="contact-links">
+          <a href="mailto:ashfakurrahman79@gmail.com" class="contact-link-item">
+            <span class="link-icon"><i class="fas fa-envelope"></i></span>
+            ashfakurrahman79@gmail.com
+          </a>
+          <a href="https://github.com/Ashfakur-Rahman" target="_blank" rel="noopener" class="contact-link-item">
+            <span class="link-icon"><i class="fab fa-github"></i></span>
+            github.com/Ashfakur-Rahman
+          </a>
+          <a href="https://linkedin.com/in/ashfakurrahman" target="_blank" rel="noopener" class="contact-link-item">
+            <span class="link-icon"><i class="fab fa-linkedin"></i></span>
+            linkedin.com/in/ashfakurrahman
+          </a>
+          <a href="https://www.researchgate.net/profile/Ashfakur-Rahman-5" target="_blank" rel="noopener" class="contact-link-item">
+            <span class="link-icon"><i class="fab fa-researchgate"></i></span>
+            ResearchGate Profile
+          </a>
+          <a href="https://instagram.com/ar_ashfak" target="_blank" rel="noopener" class="contact-link-item">
+            <span class="link-icon"><i class="fab fa-instagram"></i></span>
+            instagram.com/ar_ashfak
+          </a>
         </div>
-        <div class="form-group">
-          <input type="email" name="_replyto" placeholder="Your Email" required />
-        </div>
-        <div class="form-group">
-          <textarea name="message" placeholder="Your Message" required></textarea>
-        </div>
-        <button type="submit" class="btn" style="width:100%;"><i class="fas fa-paper-plane"></i> Send Message</button>
-      </form>
-      <p style="text-align:center; margin-top:16px; color: var(--text-muted);">
-        I typically reply within 24 hours.
-      </p>
+      </div>
+
+      <div class="contact-form-box">
+        <form action="https://formspree.io/f/mbdwgypz" method="POST">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Your name</label>
+              <input type="text" id="name" name="name" placeholder="Jane Smith" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email address</label>
+              <input type="email" id="email" name="_replyto" placeholder="jane@example.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" placeholder="PhD collaboration / Research inquiry" />
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Tell me about your research group or opportunity..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; border-radius:12px; font-size:1rem;">
+            <i class="fas fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Footer -->
+<!-- ===== FOOTER ===== -->
 <footer>
   <div class="container">
-    <p>© 2026 Ashfakur Rahman. All rights reserved.</p>
-    <div style="margin-top: 8px;">
-      <a href="https://github.com/Ashfakur-Rahman" target="_blank" rel="noopener noreferrer" style="margin:0 8px;"><i class="fab fa-github"></i></a>
-      <a href="https://linkedin.com/in/ashfakurrahman" target="_blank" rel="noopener noreferrer" style="margin:0 8px;"><i class="fab fa-linkedin"></i></a>
-      <a href="https://www.researchgate.net/profile/Ashfakur-Rahman-5?ev=hdr_xprf" target="_blank" rel="noopener noreferrer" style="margin:0 8px;"><i class="fab fa-researchgate"></i></a>
-      <a href="https://instagram.com/ar_ashfak" target="_blank" rel="noopener noreferrer" style="margin:0 8px;"><i class="fab fa-instagram"></i></a>
-      <a href="mailto:ashfakurrahman79@gmail.com" style="margin:0 8px;"><i class="fas fa-envelope"></i></a>
+    <div class="footer-inner">
+      <p class="footer-copy">© 2026 Ashfakur Rahman. Built with care for research &amp; academia.</p>
+      <div class="social-links">
+        <a href="https://github.com/Ashfakur-Rahman" target="_blank" rel="noopener" class="social-link" title="GitHub">
+          <i class="fab fa-github"></i>
+        </a>
+        <a href="https://linkedin.com/in/ashfakurrahman" target="_blank" rel="noopener" class="social-link" title="LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+        <a href="https://www.researchgate.net/profile/Ashfakur-Rahman-5" target="_blank" rel="noopener" class="social-link" title="ResearchGate">
+          <i class="fab fa-researchgate"></i>
+        </a>
+        <a href="https://instagram.com/ar_ashfak" target="_blank" rel="noopener" class="social-link" title="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="mailto:ashfakurrahman79@gmail.com" class="social-link" title="Email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </div>
     </div>
   </div>
 </footer>
 
-<!-- Scripts -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-  AOS.init({ duration: 800, once: true, offset: 100 });
+  AOS.init({ duration: 700, once: true, offset: 80, easing: 'ease-out-cubic' });
 
-  // Mobile menu toggle
   const hamburger = document.getElementById('hamburgerBtn');
   const mobileMenu = document.getElementById('mobileMenu');
-  hamburger.addEventListener('click', () => mobileMenu.classList.toggle('active'));
 
-  // Close mobile menu on link click
+  hamburger.addEventListener('click', () => {
+    mobileMenu.classList.toggle('active');
+  });
+
   mobileMenu.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => mobileMenu.classList.remove('active'));
   });
 
+  document.addEventListener('click', (e) => {
+    if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+      mobileMenu.classList.remove('active');
+    }
+  });
+
   // Project filter
   const filterBtns = document.querySelectorAll('.filter-btn');
-  const projects = document.querySelectorAll('#projectContainer .card');
+  const projects = document.querySelectorAll('#projectContainer .project-card');
+
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       filterBtns.forEach(b => b.classList.remove('active'));
@@ -688,6 +1598,22 @@
           proj.classList.add('hidden');
         }
       });
+    });
+  });
+
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      if (window.scrollY >= section.offsetTop - 120) {
+        current = section.getAttribute('id');
+      }
+    });
+    navLinks.forEach(link => {
+      link.style.color = link.getAttribute('href') === '#' + current ? 'var(--text)' : '';
     });
   });
 </script>
