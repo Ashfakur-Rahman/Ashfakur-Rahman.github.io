@@ -777,6 +777,29 @@
     .cert-item h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
     .cert-item p { font-size: 0.82rem; color: var(--text-muted); }
 
+	/* ===== ACHIEVEMENTS & BADGES ===== */
+.badge-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+}
+
+.badge-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all var(--t);
+}
+
+.badge-item:hover {
+  transform: translateY(-5px);
+  border-color: var(--border-accent);
+  box-shadow: var(--glow-primary);
+  background: var(--surface-hover);
+}
+
     /* ===== PROJECTS ===== */
     .filter-bar {
       display: flex;
@@ -1400,6 +1423,23 @@
 
 <div class="divider"></div>
 
+<!-- ===== ACHIEVEMENTS & BADGES ===== -->
+<section id="badges">
+  <div class="container">
+    <div class="section-label" data-aos="fade-right"><i class="fas fa-trophy"></i> Achievements</div>
+    <h2 class="section-title" data-aos="fade-right">Industry <span class="grad">badges</span></h2>
+    <p class="section-sub" data-aos="fade-right">Verified credentials from global platforms.</p>
+
+    <div class="badge-grid" data-aos="fade-up">
+      <div class="badge-item">
+        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="e4ffb211-8fc3-4fec-a42d-050fe7a0c9df" data-share-badge-host="https://www.credly.com"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
 <!-- ===== PROJECTS ===== -->
 <section id="projects">
   <div class="container">
@@ -1617,5 +1657,6 @@
     });
   });
 </script>
+<script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
 </body>
 </html>
