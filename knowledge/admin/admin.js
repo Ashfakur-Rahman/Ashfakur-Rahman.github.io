@@ -251,6 +251,7 @@ async function saveChapter(status) {
   message(status === "published" ? "Chapter published." : "Chapter draft saved.");
 }
 
+
 function insertHtml(html) {
   $("chapter-body").focus();
   document.execCommand("insertHTML", false, html);
@@ -260,68 +261,23 @@ function insertHtml(html) {
 document.querySelectorAll("[data-cmd]").forEach(button => button.addEventListener("click", () => {
   $("chapter-body").focus();
   document.execCommand(button.dataset.cmd, false, button.dataset.value || null);
-  chapterDraft[editorLang] = editorContent(); updatePreview();
+  chapterDraft[editorLang] = editorContent();
+  updatePreview();
 }));
 document.querySelectorAll("[data-insert]").forEach(button => button.addEventListener("click", () => {
   const kind = button.dataset.insert;
   if (kind === "equation") {
     const formula = prompt("Enter a LaTeX equation (without delimiters):", "x^2 + y^2 = z^2");
-    if (formula) insertHtml('<span>
-  if (!API_BASE || API_BASE.includes("YOUR-KNOWLEDGE-WORKER")) { $("login-message").textContent = "Set KNOWLEDGE_API_BASE after deploying the Worker."; return; }
-  location.href = API_BASE + "/auth/login";
-};
-$("new-book").onclick = newBook;
-$("new-chapter").onclick = newChapter;
-$("refresh-preview").onclick = updatePreview;
-$("chapter-body").addEventListener("input", () => { chapterDraft[editorLang] = editorContent(); updatePreview(); $("save-state").textContent = "Unsaved changes"; });
-document.querySelectorAll("[data-editor-lang]").forEach(button => button.addEventListener("click", () => {
-  chapterDraft[editorLang] = editorContent();
-  editorLang = button.dataset.editorLang;
-  syncLangTabs();
-}));
-$("save-draft").onclick = async () => { try { mode === "book" ? await saveBook("draft") : await saveChapter("draft"); } catch (error) { message(error.message); } };
-$("publish").onclick = async () => {
-  if (!confirm("Publish this reviewed content to the public Knowledge Library?")) return;
-  try { mode === "book" ? await saveBook("published") : await saveChapter("published"); }
-  catch (error) { message(error.message); }
-};
-$("preview-public").onclick = () => {
-  if (mode !== "chapter" || !selectedBook || !selectedChapter) { message("Save the chapter first, then open its private preview."); return; }
-  // Keep the preview in this tab so its sessionStorage bearer token remains available.
-  // The browser does not reliably copy sessionStorage to a noopener tab.
-  location.assign("/studio/book.html?book=" + encodeURIComponent(selectedBook) + "&chapter=" + encodeURIComponent(selectedChapter) + "&preview=1");
-};
-$("logout").onclick = async () => { try { await api("/auth/logout", { method: "POST" }); } catch (error) { message(error.message); } finally { sessionStorage.removeItem(SESSION_KEY); location.reload(); } };
-(async () => {
-  try {
-    const hash = new URLSearchParams(location.hash.slice(1));
-    const authCode = hash.get("auth_code");
-    if (authCode) {
-      history.replaceState(null, "", location.pathname + location.search);
-      const exchange = await fetch(API_BASE + "/auth/exchange", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "omit",
-        body: JSON.stringify({ code: authCode })
-      });
-      const exchanged = await exchange.json();
-      if (!exchange.ok || !exchanged.token) throw Error(exchanged.error || "Could not complete sign-in.");
-      sessionStorage.setItem(SESSION_KEY, exchanged.token);
-    }
-    const session = await api("/api/session");
-    if (!session.authenticated) throw Error("Please sign in.");
-    $("login-panel").hidden = true;
-    $("studio").hidden = false;
-    $("identity").textContent = "Signed in as @" + session.login;
-    await loadCatalog();
-  } catch (error) { $("login-message").textContent = error.message; }
-})();
- + esc(formula) + '$</span>');
-  } else if (kind === "quote") insertHtml("<blockquote><p>Write your quotation here…</p></blockquote><p></p>");
-  else if (kind === "code") insertHtml("<pre><code>Write or paste code here…</code></pre><p></p>");
-  else if (kind === "table") insertHtml('<table><thead><tr><th>Heading 1</th><th>Heading 2</th></tr></thead><tbody><tr><td>Content</td><td>Content</td></tr><tr><td>Content</td><td>Content</td></tr></tbody></table><p></p>');
-  else if (kind === "callout") insertHtml('<aside class="author-callout"><strong>Key point</strong><p>Write an important note here…</p></aside><p></p>');
-  else if (kind === "diagram") {
+    if (formula) insertHtml("<span>$" + esc(formula) + "$</span>");
+  } else if (kind === "quote") {
+    insertHtml("<blockquote><p>Write your quotation here…</p></blockquote><p></p>");
+  } else if (kind === "code") {
+    insertHtml("<pre><code>Write or paste code here…</code></pre><p></p>");
+  } else if (kind === "table") {
+    insertHtml("<table><thead><tr><th>Heading 1</th><th>Heading 2</th></tr></thead><tbody><tr><td>Content</td><td>Content</td></tr><tr><td>Content</td><td>Content</td></tr></tbody></table><p></p>");
+  } else if (kind === "callout") {
+    insertHtml('<aside class="author-callout"><strong>Key point</strong><p>Write an important note here…</p></aside><p></p>');
+  } else if (kind === "diagram") {
     const first = prompt("First step:", "Input");
     if (first === null) return;
     const second = prompt("Second step:", "Process");
@@ -329,49 +285,73 @@ $("logout").onclick = async () => { try { await api("/auth/logout", { method: "P
     const third = prompt("Final step:", "Output");
     if (third === null) return;
     insertHtml('<figure class="author-diagram"><div class="diagram-node">' + esc(first) + '</div><div class="diagram-arrow">↓</div><div class="diagram-node">' + esc(second) + '</div><div class="diagram-arrow">↓</div><div class="diagram-node">' + esc(third) + '</div><figcaption>Process diagram</figcaption></figure><p></p>');
-  } else if (kind === "image") $("image-upload").click();
+  } else if (kind === "image") {
+    $("image-upload").click();
+  }
 }));
 $("image-upload").addEventListener("change", event => {
-  const file = event.target.files?.[0];
+  const file = event.target.files && event.target.files[0];
   if (!file) return;
-  if (file.size > 350 * 1024) { message("Please use an image smaller than 350 KB for now."); event.target.value = ""; return; }
-  const reader = new FileReader();
-  reader.onload = () => {
-    const src = String(reader.result || "");
-    if (!/^data:image\/(png|jpeg|webp);base64,/.test(src)) { message("Unsupported image format."); return; }
-    const caption = prompt("Figure caption (optional):", file.name.replace(/\\.[^.]+$/, "")) || "";
+  if (file.size > 350 * 1024) {
+    message("Please use an image smaller than 350 KB for now.");
+    event.target.value = "";
+    return;
+  }
+  const fileReader = new FileReader();
+  fileReader.onload = () => {
+    const src = String(fileReader.result || "");
+    if (!/^data:image\/(png|jpeg|webp);base64,/.test(src)) {
+      message("Unsupported image format.");
+      return;
+    }
+    const caption = prompt("Figure caption (optional):", file.name.replace(/\.[^.]+$/, "")) || "";
     insertHtml('<figure><img src="' + src + '" alt="' + esc(caption) + '" style="max-width:100%;height:auto"><figcaption>' + esc(caption) + '</figcaption></figure><p></p>');
     message("Image inserted. Save the chapter to store it privately.");
   };
-  reader.readAsDataURL(file);
+  fileReader.readAsDataURL(file);
   event.target.value = "";
 });
 $("login").onclick = () => {
-  if (!API_BASE || API_BASE.includes("YOUR-KNOWLEDGE-WORKER")) { $("login-message").textContent = "Set KNOWLEDGE_API_BASE after deploying the Worker."; return; }
+  if (!API_BASE || API_BASE.includes("YOUR-KNOWLEDGE-WORKER")) {
+    $("login-message").textContent = "Knowledge API is not configured.";
+    return;
+  }
   location.href = API_BASE + "/auth/login";
 };
 $("new-book").onclick = newBook;
 $("new-chapter").onclick = newChapter;
 $("refresh-preview").onclick = updatePreview;
-$("chapter-body").addEventListener("input", () => { chapterDraft[editorLang] = editorContent(); updatePreview(); $("save-state").textContent = "Unsaved changes"; });
+$("chapter-body").addEventListener("input", () => {
+  chapterDraft[editorLang] = editorContent();
+  updatePreview();
+  $("save-state").textContent = "Unsaved changes";
+});
 document.querySelectorAll("[data-editor-lang]").forEach(button => button.addEventListener("click", () => {
   chapterDraft[editorLang] = editorContent();
   editorLang = button.dataset.editorLang;
   syncLangTabs();
 }));
-$("save-draft").onclick = async () => { try { mode === "book" ? await saveBook("draft") : await saveChapter("draft"); } catch (error) { message(error.message); } };
+$("save-draft").onclick = async () => {
+  try { mode === "book" ? await saveBook("draft") : await saveChapter("draft"); }
+  catch (error) { message(error.message); }
+};
 $("publish").onclick = async () => {
   if (!confirm("Publish this reviewed content to the public Knowledge Library?")) return;
   try { mode === "book" ? await saveBook("published") : await saveChapter("published"); }
   catch (error) { message(error.message); }
 };
 $("preview-public").onclick = () => {
-  if (mode !== "chapter" || !selectedBook || !selectedChapter) { message("Save the chapter first, then open its private preview."); return; }
-  // Keep the preview in this tab so its sessionStorage bearer token remains available.
-  // The browser does not reliably copy sessionStorage to a noopener tab.
+  if (mode !== "chapter" || !selectedBook || !selectedChapter) {
+    message("Save the chapter first, then open its private preview.");
+    return;
+  }
   location.assign("/studio/book.html?book=" + encodeURIComponent(selectedBook) + "&chapter=" + encodeURIComponent(selectedChapter) + "&preview=1");
 };
-$("logout").onclick = async () => { try { await api("/auth/logout", { method: "POST" }); } catch (error) { message(error.message); } finally { sessionStorage.removeItem(SESSION_KEY); location.reload(); } };
+$("logout").onclick = async () => {
+  try { await api("/auth/logout", { method: "POST" }); }
+  catch (error) { message(error.message); }
+  finally { sessionStorage.removeItem(SESSION_KEY); location.reload(); }
+};
 (async () => {
   try {
     const hash = new URLSearchParams(location.hash.slice(1));
@@ -394,5 +374,7 @@ $("logout").onclick = async () => { try { await api("/auth/logout", { method: "P
     $("studio").hidden = false;
     $("identity").textContent = "Signed in as @" + session.login;
     await loadCatalog();
-  } catch (error) { $("login-message").textContent = error.message; }
+  } catch (error) {
+    $("login-message").textContent = error.message;
+  }
 })();
