@@ -221,7 +221,12 @@ async function handleApi(request, env, url) {
     if (!book) return json({error:"Book or chapter not found."},404);
     if (body.type === "book") {
       book.status = "draft";
-      for (const chapter of book.chapters || []) await env.SESSIONS.delete(publicChapterKey(chapter.slug));
+      for (const entry of book.chapters || []) {
+        entry.status = "draft";
+        const chapter = await getDraftChapter(env,entry.slug);
+        if (chapter) { chapter.status = "draft"; await env.SESSIONS.put(draftChapterKey(entry.slug),JSON.stringify(chapter)); }
+        await env.SESSIONS.delete(publicChapterKey(entry.slug));
+      }
     } else {
       const entry = (book.chapters || []).find(item=>item.slug===body.slug);
       entry.status = "draft";
