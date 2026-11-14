@@ -119,6 +119,12 @@ function syncLangTabs() {
   document.querySelectorAll("[data-editor-lang]").forEach(button => button.classList.toggle("selected", button.dataset.editorLang === editorLang));
   $("chapter-body").value = chapterDraft[editorLang] || "";
 }
+function normalizeMarkdown(value = "") {
+  let source = String(value);
+  if (!source.includes("\n") && /\\n/.test(source)) source = source.replace(/\\r?\\n/g, "\n");
+  source = source.replace(/\\\\([()])/g, "\\$1");
+  return source;
+}
 function markdownInline(value) {
   let html = esc(value);
   const tick = String.fromCharCode(96);
