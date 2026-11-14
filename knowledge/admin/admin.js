@@ -82,6 +82,7 @@ function newChapter() {
   setMode("chapter");
   chapterDraft = { en: "", bn: "" };
   editorLang = "en";
+  $("chapter-book").disabled = false;
   $("chapter-book").value = selectedBook || catalog.books[0].slug;
   $("chapter-title-en").value = "";
   $("chapter-title-bn").value = "";
@@ -102,6 +103,7 @@ async function editChapter(bookSlug, chapterSlug) {
     chapterDraft = { en: chapter.content?.en || "", bn: chapter.content?.bn || "" };
     editorLang = "en";
     $("chapter-book").value = bookSlug;
+    $("chapter-book").disabled = true;
     $("chapter-title-en").value = chapter.title?.en || "";
     $("chapter-title-bn").value = chapter.title?.bn || "";
     $("chapter-order").value = chapter.order || 1;
