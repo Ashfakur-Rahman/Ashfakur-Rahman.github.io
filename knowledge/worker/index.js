@@ -124,6 +124,20 @@ export default {
         if (url.pathname === "/api/session" && req.method === "GET") {
           return json({ authenticated: true, login: JSON.parse(session).login });
         }
+        if (url.pathname === "/api/chapter" && req.method === "GET") {
+          const bookSlug = url.searchParams.get("book") || "";
+          const chapterSlug = url.searchParams.get("chapter") || "";
+          if (!/^[a-z0-9-]{1,70}$/.test(bookSlug) || !/^[a-z0-9-]{1,70}$/.test(chapterSlug)) {
+            return json({ error: "Invalid book or chapter slug." }, 400);
+          }
+          const catalog = await readRepoJson(env, "knowledge/content/catalog.json");
+          const book = (catalog.books || []).find(item => item.slug === bookSlug);
+          const chapterEntry = book && (book.chapters || []).find(item => item.slug === chapterSlug);
+          if (!book || !chapterEntry) return json({ error: "Book or chapter not found." }, 404);
+          const chapter = await readRepoJson(env, "knowledge/content/chapters/" + chapterSlug + ".json");
+          if (chapter.book !== bookSlug) return json({ error: "Chapter does not belong to this book." }, 404);
+          return json({ book, chapter });
+        }
         if (url.pathname === "/api/preview" && req.method === "GET") {
           const bookSlug = url.searchParams.get("book") || "";
           const chapterSlug = url.searchParams.get("chapter") || "";
