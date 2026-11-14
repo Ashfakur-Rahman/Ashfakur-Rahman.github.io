@@ -43,7 +43,7 @@ After the Worker is deployed, verify:
 4. Only the authorized GitHub account can sign in to Studio.
 5. Create a disposable book and chapter, save drafts, reload, and confirm the data persists in KV (not GitHub repository files).
 6. Preview works only with the author session.
-7. Publish a test book and chapter; verify they appear on the public catalog and reader. Unpublish and verify they disappear.
+7. Publish a test book and chapter; verify they appear on the public catalog and reader. Save further draft edits and verify the published snapshot remains unchanged. Unpublish and verify they disappear.
 8. Test both languages, toolbar formatting, equations, image upload, tables, code, diagrams, and callouts.
 9. Test Chrome/Edge desktop and a mobile browser.
 
