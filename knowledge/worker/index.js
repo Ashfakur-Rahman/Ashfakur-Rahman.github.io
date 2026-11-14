@@ -101,7 +101,7 @@ const publicChapterKey = slug => "content:published:chapter:" + slug;
 async function getDraftCatalog(env) {
   let raw = await env.SESSIONS.get(DRAFT_CATALOG_KEY);
   if (raw) return JSON.parse(raw);
-  // One-time bootstrap from the existing starter catalog. Subsequent edits stay in KV.
+  // Initialize a clean private catalog. No draft content is read from the public repository.
   const initial = { schemaVersion: 1, books: [] };
   await env.SESSIONS.put(DRAFT_CATALOG_KEY, JSON.stringify(initial));
   return initial;
@@ -206,10 +206,6 @@ async function serveStudio(request, env, url) {
     "/studio/assets/reader.js": ["knowledge/assets/reader.js", "text/javascript; charset=utf-8"],
   };
   let entry = routes[url.pathname];
-  if (!entry) {
-    const chapterMatch = url.pathname.match(/^\/studio\/content\/chapters\/([a-z0-9-]{1,70})\.json$/);
-    if (chapterMatch) entry = ["knowledge/content/chapters/" + chapterMatch[1] + ".json", "application/json; charset=utf-8"];
-  }
   if (!entry) return null;
   const file = await githubRequest(
     env,
