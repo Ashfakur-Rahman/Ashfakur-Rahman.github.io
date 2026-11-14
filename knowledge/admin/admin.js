@@ -93,9 +93,8 @@ function newChapter() {
 }
 async function editChapter(bookSlug, chapterSlug) {
   try {
-    const response = await fetch("../content/chapters/" + encodeURIComponent(chapterSlug) + ".json?v=" + Date.now(), { cache: "no-store" });
-    if (!response.ok) throw Error("Could not load this chapter file.");
-    const chapter = await response.json();
+    const result = await api("/api/chapter?book=" + encodeURIComponent(bookSlug) + "&chapter=" + encodeURIComponent(chapterSlug));
+    const chapter = result.chapter;
     if (chapter.book !== bookSlug) throw Error("The selected chapter does not belong to this book.");
     selectedBook = bookSlug;
     selectedChapter = chapterSlug;
