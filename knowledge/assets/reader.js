@@ -10,9 +10,20 @@ const base = "./content/";
 function esc(value = "") {
   return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
 }
+function normalizeMarkdown(value = "") {
+  let source = String(value);
+  // Repair legacy starter content stored with literal escaped newlines.
+  if (!source.includes("\n") && /\\n/.test(source)) source = source.replace(/\\r?\\n/g, "\n");
+  // Repair double-escaped KaTeX delimiters in legacy content.
+  source = source.replace(/\\\\([()])/g, "\\$1");
+  return source;
+}
 function safeMarkdown(markdown) {
-  const html = window.marked ? marked.parse(markdown || "") : esc(markdown || "").replace(/\n/g, "<br>");
-  return window.DOMPurify ? DOMPurify.sanitize(html) : esc(markdown || "").replace(/\n/g, "<br>");
+  const source = normalizeMarkdown(markdown);
+  if (!window.marked || !window.DOMPurify) {
+    return "<pre class=\"markdown-unavailable\">" + esc(source) + "</pre>";
+  }
+  return DOMPurify.sanitize(marked.parse(source));
 }
 function render() {
   document.querySelector("#chapter-title").textContent = chapterData.title?.[lang] || chapterData.title?.en || "";
