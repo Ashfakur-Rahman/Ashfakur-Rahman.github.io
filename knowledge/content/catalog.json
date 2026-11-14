@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "books": [
+    {
+      "slug": "numerical-methods",
+      "status": "draft",
+      "subject": "Mathematics",
+      "level": "Undergraduate",
+      "title": {
+        "en": "Numerical Methods",
+        "bn": "সংখ্যাত্মক পদ্ধতি"
+      },
+      "description": {
+        "en": "A structured introduction to numerical techniques, approximation, interpolation, and numerical solutions of equations.",
+        "bn": "সংখ্যাত্মক কৌশল, আনুমানিক মান, ইন্টারপোলেশন এবং সমীকরণের সংখ্যাত্মক সমাধানের একটি ধারাবাহিক পরিচিতি।"
+      },
+      "tags": [
+        "Mathematics",
+        "Numerical Analysis"
+      ],
+      "chapterCount": 1,
+      "chapters": [
+        {
+          "slug": "introduction",
+          "order": 1,
+          "status": "draft",
+          "title": {
+            "en": "Introduction to Numerical Methods",
+            "bn": "সংখ্যাত্মক পদ্ধতির পরিচিতি"
+          }
+        }
+      ]
+    }
+  ]
+}
