@@ -132,22 +132,16 @@ function render() {
 }
 document.querySelectorAll("[data-lang]").forEach(button => button.addEventListener("click", () => { lang = button.dataset.lang; render(); }));
 async function loadPreview() {
-  const apiBase = window.KNOWLEDGE_API_BASE || "";
-  if (!apiBase || apiBase.includes("YOUR-KNOWLEDGE-WORKER")) throw Error("Private preview is not configured.");
+  const apiBase = window.KNOWLEDGE_API_BASE || "https://knowledge-library-auth.ashfakurrahman79.workers.dev";
   const response = await fetch(apiBase + "/api/preview?book=" + encodeURIComponent(bookSlug) + "&chapter=" + encodeURIComponent(chapterSlug), {
     credentials: "omit",
-    headers: {
-      Accept: "application/json",
-      Authorization: "Bearer " + (sessionStorage.getItem("knowledge_studio_session") || "")
-    },
+    headers: { Accept: "application/json", Authorization: "Bearer " + (sessionStorage.getItem("knowledge_studio_session") || "") },
     cache: "no-store"
   });
   const data = await response.json();
   if (!response.ok) throw Error(data.error || "You are not authorized to preview this draft.");
   book = data.book;
   chapterData = data.chapter;
-  */
-  book = publishedData.book;
   document.querySelector("#book-title").textContent = book.title?.en || book.slug;
   document.querySelector("#chapter-label").textContent = "PRIVATE PREVIEW · " + String(chapterData.order || 1).padStart(2, "0");
   document.querySelector("#chapter-nav").innerHTML = '<p class="hint">Authenticated author preview. This content is not published in the public library.</p>';
@@ -155,7 +149,8 @@ async function loadPreview() {
   document.querySelector("#next").hidden = true;
 }
 async function loadPublished() {
-  catalog = await fetch(API_BASE + "/public/catalog").then(response => {
+  const apiBase = window.KNOWLEDGE_API_BASE || "https://knowledge-library-auth.ashfakurrahman79.workers.dev";
+  catalog = await fetch(apiBase + "/public/catalog", {cache:"no-store"}).then(response => {
     if (!response.ok) throw Error("Catalog unavailable.");
     return response.json();
   });
@@ -164,15 +159,11 @@ async function loadPublished() {
   const chapters = (book.chapters || []).filter(item => item.status === "published").sort((a, b) => a.order - b.order);
   const current = chapters.find(item => item.slug === chapterSlug);
   if (!current) throw Error("This chapter is not available.");
-  const published = await fetch(API_BASE + "/public/chapter?book=" + encodeURIComponent(bookSlug) + "&chapter=" + encodeURIComponent(chapterSlug));
-  if (!published.ok) throw Error("Chapter unavailable.");
-  const publishedData = await published.json();
-  chapterData = publishedData.chapter;
-  /* legacy static chapter fetch removed */
-  /* chapterData = await fetch(base + "chapters/" + encodeURIComponent(chapterSlug) + ".json").then(response => {
-    if (!response.ok) throw Error("Chapter unavailable.");
-    return response.json();
-  });
+  const response = await fetch(apiBase + "/public/chapter?book=" + encodeURIComponent(bookSlug) + "&chapter=" + encodeURIComponent(chapterSlug), {cache:"no-store"});
+  if (!response.ok) throw Error("Chapter unavailable.");
+  const data = await response.json();
+  book = data.book;
+  chapterData = data.chapter;
   document.querySelector("#book-title").textContent = book.title?.en || book.slug;
   document.querySelector("#chapter-label").textContent = "CHAPTER " + String(current.order).padStart(2, "0") + " · " + (book.subject || "");
   document.querySelector("#chapter-nav").innerHTML = chapters.map(chapter =>
