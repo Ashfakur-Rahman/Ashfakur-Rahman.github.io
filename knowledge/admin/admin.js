@@ -121,7 +121,8 @@ function showEditorContent(value = "") {
   const source = String(value || "");
   if (source.startsWith("<!--knowledge-html-->")) {
     const html = source.replace(/^<!--knowledge-html-->\\n?/, "");
-    $("chapter-body").innerHTML = window.DOMPurify ? DOMPurify.sanitize(html) : html;
+    $("chapter-body").innerHTML = window.DOMPurify ? DOMPurify.sanitize(html) : "";
+    if (!window.DOMPurify) $("chapter-body").textContent = html;
   }
   else $("chapter-body").innerHTML = window.marked ? marked.parse(normalizeMarkdown(source)) : basicMarkdown(source);
 }
