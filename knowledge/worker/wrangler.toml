@@ -9,6 +9,6 @@ id = "REPLACE_WITH_KV_NAMESPACE_ID"
 [vars]
 GITHUB_OWNER = "Ashfakur-Rahman"
 GITHUB_REPO = "Ashfakur-Rahman.github.io"
-GITHUB_BRANCH = "main"
+GITHUB_BRANCH = "feature/knowledge-library-foundation"
 ADMIN_GITHUB_LOGIN = "Ashfakur-Rahman"
 OAUTH_CALLBACK_URL = "https://YOUR-WORKER.workers.dev/auth/callback"
