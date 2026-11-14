@@ -6,7 +6,7 @@ const status = document.querySelector("#reader-status");
 const reader = document.querySelector("#reader");
 let lang = "en";
 let chapterData, catalog, book;
-const base = "./content/";
+const API_BASE = window.KNOWLEDGE_API_BASE || "https://knowledge-library-auth.ashfakurrahman79.workers.dev";
 function esc(value = "") {
   return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
 }
@@ -146,6 +146,8 @@ async function loadPreview() {
   if (!response.ok) throw Error(data.error || "You are not authorized to preview this draft.");
   book = data.book;
   chapterData = data.chapter;
+  */
+  book = publishedData.book;
   document.querySelector("#book-title").textContent = book.title?.en || book.slug;
   document.querySelector("#chapter-label").textContent = "PRIVATE PREVIEW · " + String(chapterData.order || 1).padStart(2, "0");
   document.querySelector("#chapter-nav").innerHTML = '<p class="hint">Authenticated author preview. This content is not published in the public library.</p>';
@@ -153,7 +155,7 @@ async function loadPreview() {
   document.querySelector("#next").hidden = true;
 }
 async function loadPublished() {
-  catalog = await fetch(base + "catalog.json").then(response => {
+  catalog = await fetch(API_BASE + "/public/catalog").then(response => {
     if (!response.ok) throw Error("Catalog unavailable.");
     return response.json();
   });
@@ -162,7 +164,12 @@ async function loadPublished() {
   const chapters = (book.chapters || []).filter(item => item.status === "published").sort((a, b) => a.order - b.order);
   const current = chapters.find(item => item.slug === chapterSlug);
   if (!current) throw Error("This chapter is not available.");
-  chapterData = await fetch(base + "chapters/" + encodeURIComponent(chapterSlug) + ".json").then(response => {
+  const published = await fetch(API_BASE + "/public/chapter?book=" + encodeURIComponent(bookSlug) + "&chapter=" + encodeURIComponent(chapterSlug));
+  if (!published.ok) throw Error("Chapter unavailable.");
+  const publishedData = await published.json();
+  chapterData = publishedData.chapter;
+  /* legacy static chapter fetch removed */
+  /* chapterData = await fetch(base + "chapters/" + encodeURIComponent(chapterSlug) + ".json").then(response => {
     if (!response.ok) throw Error("Chapter unavailable.");
     return response.json();
   });
