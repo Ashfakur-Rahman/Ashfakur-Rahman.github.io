@@ -1,0 +1,36 @@
+name: Knowledge Library checks
+
+on:
+  push:
+    branches:
+      - feature/knowledge-library-foundation
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  syntax-and-privacy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --check knowledge/admin/admin.js
+          node --check knowledge/assets/library.js
+          node --check knowledge/assets/reader.js
+          node --check --input-type=module < knowledge/worker/index.js
+      - name: Ensure draft JSON is not in the public tree
+        run: |
+          test ! -e knowledge/content/catalog.json
+          test ! -e knowledge/content/chapters/introduction.json
+      - name: Verify public and protected API routes exist
+        run: |
+          grep -q '"/public/catalog"' knowledge/worker/index.js
+          grep -q '"/public/chapter"' knowledge/worker/index.js
+          grep -q '"/api/catalog"' knowledge/worker/index.js
+          grep -q '"/api/preview"' knowledge/worker/index.js
+          grep -q '"/api/publish"' knowledge/worker/index.js
+          grep -q '"/api/unpublish"' knowledge/worker/index.js
