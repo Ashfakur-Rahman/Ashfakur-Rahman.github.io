@@ -82,7 +82,7 @@ function renderMathFallback(root) {
   while (walker.nextNode()) {
     const node = walker.currentNode;
     if (node.parentElement?.closest("pre, code, .katex")) continue;
-    if (/\\\(|\\\[|\$\$/.test(node.nodeValue || "")) nodes.push(node);
+    if (/\\\(|\\\[|\$/.test(node.nodeValue || "")) nodes.push(node);
   }
   const pattern = /\\\[(.+?)\\\]|\$\$(.+?)\$\$|\$(?!\$)(.+?)(?<!\\)\$/gs;
   for (const node of nodes) {
