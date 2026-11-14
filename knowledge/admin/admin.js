@@ -8,6 +8,7 @@ let selectedBook = null;
 let selectedChapter = null;
 let editorLang = "en";
 let chapterDraft = { en: "", bn: "" };
+let autosaveTimer = null;
 const $ = id => document.getElementById(id);
 const slug = value => value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 70);
 const esc = value => String(value || "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
@@ -257,6 +258,27 @@ async function saveChapter(status) {
 }
 
 
+function scheduleAutosave() {
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(async () => {
+    try {
+      if (mode === "book") {
+        if (!$("book-title-en").value.trim()) return;
+        await saveBook("draft");
+      } else {
+        if (!$("chapter-title-en").value.trim() || !$("chapter-book").value) return;
+        await saveChapter("draft");
+      }
+      $("save-state").textContent = "Saved automatically";
+    } catch (error) {
+      message("Autosave: " + error.message);
+    }
+  }, 1800);
+}
+document.querySelectorAll("#book-fields input, #book-fields textarea, #book-fields select, #chapter-fields input, #chapter-fields select").forEach(field => {
+  field.addEventListener("input", scheduleAutosave);
+  field.addEventListener("change", scheduleAutosave);
+});
 function insertHtml(html) {
   $("chapter-body").focus();
   document.execCommand("insertHTML", false, html);
@@ -330,6 +352,7 @@ $("chapter-body").addEventListener("input", () => {
   chapterDraft[editorLang] = editorContent();
   updatePreview();
   $("save-state").textContent = "Unsaved changes";
+  scheduleAutosave();
 });
 document.querySelectorAll("[data-editor-lang]").forEach(button => button.addEventListener("click", () => {
   chapterDraft[editorLang] = editorContent();
