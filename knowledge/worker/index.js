@@ -179,18 +179,61 @@ async function handleApi(request, env, url) {
     if (path === "knowledge/content/catalog.json") {
       if (!Array.isArray(data.books)) return json({error:"Invalid catalog format."},400);
       await env.SESSIONS.put(DRAFT_CATALOG_KEY, JSON.stringify(data));
-      await refreshPublishedCatalog(env, data);
       return json({saved:true, storage:"private-kv"});
     }
     const match = path.match(/^knowledge\/content\/chapters\/([a-z0-9-]{1,70})\.json$/);
     if (!match || data.slug !== match[1] || !/^[a-z0-9-]{1,70}$/.test(data.book || "")) return json({error:"Path or chapter data is not allowed."},400);
     await env.SESSIONS.put(draftChapterKey(match[1]), JSON.stringify(data));
-    if (data.status === "published") await env.SESSIONS.put(publicChapterKey(match[1]), JSON.stringify(data));
-    else await env.SESSIONS.delete(publicChapterKey(match[1]));
-    const catalog = await getDraftCatalog(env);
-    await refreshPublishedCatalog(env, catalog);
     return json({saved:true, storage:"private-kv"});
   }
+  if (url.pathname === "/api/publish" && request.method === "POST") {
+    const body = await request.json().catch(() => null);
+    if (!body || !["book","chapter"].includes(body.type) || !/^[a-z0-9-]{1,70}$/.test(body.slug || "")) return json({error:"Invalid publish request."},400);
+    const catalog = await getDraftCatalog(env);
+    if (body.type === "book") {
+      const book = (catalog.books || []).find(item=>item.slug===body.slug);
+      if (!book) return json({error:"Book not found."},404);
+      book.status = "published";
+      await env.SESSIONS.put(DRAFT_CATALOG_KEY, JSON.stringify(catalog));
+      await refreshPublishedCatalog(env,catalog);
+      return json({published:true,type:"book",slug:body.slug});
+    }
+    const chapter = await getDraftChapter(env,body.slug);
+    if (!chapter) return json({error:"Chapter not found."},404);
+    const book = (catalog.books || []).find(item=>item.slug===chapter.book);
+    if (!book || book.status !== "published") return json({error:"Publish the parent book first."},409);
+    const entry = (book.chapters || []).find(item=>item.slug===body.slug);
+    if (!entry) return json({error:"Chapter is not listed in its parent book."},404);
+    chapter.status = "published";
+    entry.status = "published";
+    await env.SESSIONS.put(draftChapterKey(body.slug),JSON.stringify(chapter));
+    await env.SESSIONS.put(DRAFT_CATALOG_KEY,JSON.stringify(catalog));
+    await env.SESSIONS.put(publicChapterKey(body.slug),JSON.stringify(chapter));
+    await refreshPublishedCatalog(env,catalog);
+    return json({published:true,type:"chapter",slug:body.slug});
+  }
+
+  if (url.pathname === "/api/unpublish" && request.method === "POST") {
+    const body = await request.json().catch(() => null);
+    if (!body || !["book","chapter"].includes(body.type) || !/^[a-z0-9-]{1,70}$/.test(body.slug || "")) return json({error:"Invalid unpublish request."},400);
+    const catalog = await getDraftCatalog(env);
+    const book = body.type === "book" ? (catalog.books || []).find(item=>item.slug===body.slug) : (catalog.books || []).find(item=>(item.chapters || []).some(ch=>ch.slug===body.slug));
+    if (!book) return json({error:"Book or chapter not found."},404);
+    if (body.type === "book") {
+      book.status = "draft";
+      for (const chapter of book.chapters || []) await env.SESSIONS.delete(publicChapterKey(chapter.slug));
+    } else {
+      const entry = (book.chapters || []).find(item=>item.slug===body.slug);
+      entry.status = "draft";
+      const chapter = await getDraftChapter(env,body.slug);
+      if (chapter) { chapter.status = "draft"; await env.SESSIONS.put(draftChapterKey(body.slug),JSON.stringify(chapter)); }
+      await env.SESSIONS.delete(publicChapterKey(body.slug));
+    }
+    await env.SESSIONS.put(DRAFT_CATALOG_KEY,JSON.stringify(catalog));
+    await refreshPublishedCatalog(env,catalog);
+    return json({unpublished:true,type:body.type,slug:body.slug});
+  }
+
   return json({ error: "Not found." }, 404);
 }
 
