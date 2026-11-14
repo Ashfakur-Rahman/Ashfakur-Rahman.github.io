@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "slug": "introduction",
+  "book": "numerical-methods",
+  "status": "draft",
+  "order": 1,
+  "title": {
+    "en": "Introduction to Numerical Methods",
+    "bn": "সংখ্যাত্মক পদ্ধতির পরিচিতি"
+  },
+  "content": {
+    "en": "# Introduction to Numerical Methods\\n\\nNumerical methods are systematic computational techniques for obtaining approximate solutions to mathematical problems. They are especially useful when an exact analytical solution is difficult, unavailable, or impractical.\\n\\n## Learning objectives\\n\\nAfter this chapter, a learner should be able to:\\n\\n- Explain why numerical methods are needed.\\n- Distinguish an exact solution from an approximation.\\n- Recognize the role of error and convergence in numerical computation.\\n\\n## A simple illustration\\n\\nSuppose we want to approximate the value of \\\\(\\\\sqrt{2}\\\\). Its decimal representation is non-terminating, so a numerical procedure produces a finite approximation such as 1.4142. The approximation is useful only when its accuracy is understood.\\n\\n> Editorial note: This is an initial content placeholder. Replace it with your reviewed lesson before publishing.\\n",
+    "bn": "# সংখ্যাত্মক পদ্ধতির পরিচিতি\\n\\nসংখ্যাত্মক পদ্ধতি হলো গাণিতিক সমস্যার আনুমানিক সমাধান নির্ণয়ের জন্য ব্যবহৃত সুসংগঠিত গণনাভিত্তিক কৌশল। কোনো সমস্যার সঠিক বিশ্লেষণাত্মক সমাধান পাওয়া কঠিন, অসম্ভব বা অবাস্তব হলে এসব পদ্ধতি বিশেষভাবে কার্যকর।\\n\\n## শেখার লক্ষ্য\\n\\nএই অধ্যায় শেষে শিক্ষার্থী পারবে:\\n\\n- সংখ্যাত্মক পদ্ধতির প্রয়োজনীয়তা ব্যাখ্যা করতে।\\n- সঠিক সমাধান ও আনুমানিক সমাধানের পার্থক্য বুঝতে।\\n- সংখ্যাত্মক গণনায় error ও convergence-এর ভূমিকা চিনতে।\\n\\n## একটি সহজ উদাহরণ\\n\\nধরা যাক, আমরা \\\\(\\\\sqrt{2}\\\\)-এর মান আনুমানিকভাবে নির্ণয় করতে চাই। এর দশমিক রূপ অসীম ও অনাবৃত্ত, তাই একটি সংখ্যাত্মক পদ্ধতি 1.4142-এর মতো সসীম আনুমানিক মান দিতে পারে। এই মান কতটা নির্ভুল, সেটিও বুঝতে হবে।\\n\\n> সম্পাদকের নোট: এটি প্রাথমিক নমুনা কনটেন্ট। প্রকাশের আগে নিজের পর্যালোচিত পাঠ দিয়ে প্রতিস্থাপন করুন।\\n"
+  }
+}
