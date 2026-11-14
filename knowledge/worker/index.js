@@ -189,7 +189,8 @@ export default {
           return new Response("GitHub OAuth secrets are not configured.", { status: 500 });
         }
         const state = randomToken();
-        await env.SESSIONS.put("state:" + state, "valid", { expirationTtl: STATE_TTL });
+        const verifyOnly = url.searchParams.get("verify") === "1";
+        await env.SESSIONS.put("state:" + state, verifyOnly ? "verify" : "login", { expirationTtl: STATE_TTL });
         const authorize = new URL("https://github.com/login/oauth/authorize");
         authorize.searchParams.set("client_id", env.GITHUB_CLIENT_ID);
         authorize.searchParams.set("redirect_uri", "https://knowledge-library-auth.ashfakurrahman79.workers.dev/auth/callback");
@@ -237,13 +238,21 @@ export default {
           return new Response("This GitHub account is not authorized to access Knowledge Studio.", { status: 403 });
         }
 
-        const handoff = randomToken();
         const user = {
           id: githubUser.id,
           login: githubUser.login,
           name: githubUser.name,
           avatar_url: githubUser.avatar_url
         };
+
+        if (savedState === "verify") {
+          return new Response(
+            "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>OAuth verification</title><body style=\"font:16px system-ui;max-width:620px;margin:12vh auto;padding:24px;line-height:1.6\"><h1>GitHub OAuth verified</h1><p>Authentication succeeded and the authorized account was confirmed.</p><p><strong>GitHub account:</strong> @" + githubUser.login + "</p><p>Cloudflare Worker callback and KV state validation are working. No session token or OAuth secret is displayed.</p><p>You can close this tab.</p></body></html>",
+            { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } }
+          );
+        }
+
+        const handoff = randomToken();
         await env.SESSIONS.put("handoff:" + handoff, JSON.stringify(user), { expirationTtl: HANDOFF_TTL });
         return Response.redirect(ADMIN_URL + "#auth_code=" + handoff, 302);
       }
