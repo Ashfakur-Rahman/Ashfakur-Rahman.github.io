@@ -121,7 +121,8 @@ function render() {
   const content = document.querySelector("#chapter-content");
   if (raw.startsWith("<!--knowledge-html-->")) {
     const authoredHtml = raw.replace(/^<!--knowledge-html-->\\n?/, "");
-    content.innerHTML = window.DOMPurify ? DOMPurify.sanitize(authoredHtml) : authoredHtml;
+    if (window.DOMPurify) content.innerHTML = DOMPurify.sanitize(authoredHtml);
+    else content.textContent = authoredHtml;
   } else {
     content.innerHTML = safeMarkdown(raw);
   }
