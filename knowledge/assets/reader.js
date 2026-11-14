@@ -119,7 +119,12 @@ function render() {
     raw = raw.replace(/^\s*#\s+.+?(?:\n|$)/, "");
   }
   const content = document.querySelector("#chapter-content");
-  content.innerHTML = safeMarkdown(raw);
+  if (raw.startsWith("<!--knowledge-html-->")) {
+    const authoredHtml = raw.replace(/^<!--knowledge-html-->\\n?/, "");
+    content.innerHTML = window.DOMPurify ? DOMPurify.sanitize(authoredHtml) : authoredHtml;
+  } else {
+    content.innerHTML = safeMarkdown(raw);
+  }
   if (window.renderMathInElement) {
     renderMathInElement(content, {
       delimiters: [{ left: "$", right: "$", display: true }, { left: "$", right: "$", display: false }, { left: "\\[", right: "\\]", display: true }],
