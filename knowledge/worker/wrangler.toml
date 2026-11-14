@@ -4,7 +4,7 @@ compatibility_date = "2026-11-14"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "3f757636c0c049848c790ffe46e8f9a1"
 
 [vars]
 GITHUB_OWNER = "Ashfakur-Rahman"
