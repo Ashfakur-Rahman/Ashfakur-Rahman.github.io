@@ -118,7 +118,10 @@ function editorContent() {
 }
 function showEditorContent(value = "") {
   const source = String(value || "");
-  if (source.startsWith("<!--knowledge-html-->")) $("chapter-body").innerHTML = source.replace(/^<!--knowledge-html-->\\n?/, "");
+  if (source.startsWith("<!--knowledge-html-->")) {
+    const html = source.replace(/^<!--knowledge-html-->\\n?/, "");
+    $("chapter-body").innerHTML = window.DOMPurify ? DOMPurify.sanitize(html) : html;
+  }
   else $("chapter-body").innerHTML = window.marked ? marked.parse(normalizeMarkdown(source)) : basicMarkdown(source);
 }
 function syncLangTabs() {
