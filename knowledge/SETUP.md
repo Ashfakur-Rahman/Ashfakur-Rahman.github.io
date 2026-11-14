@@ -13,14 +13,15 @@ The starter Numerical Methods entry is a **draft placeholder**, not a completed 
 
 ## Security model and limitations
 - GitHub OAuth identifies the author; the Worker allowlists `ADMIN_GITHUB_LOGIN`.
-- One-time OAuth state and session identifiers are stored in KV.
-- The GitHub write token is a Worker secret and is never exposed to the browser.
-- API requests require the exact portfolio Origin.
+- One-time OAuth state, handoff codes, and bearer-session identifiers are stored in KV.
+- The OAuth callback allowlists the configured administrator GitHub login before issuing a handoff code.
+- The browser exchanges the one-time code and stores the short-lived session token in `sessionStorage`; it is not a cookie and is not shared with other browser tabs.
+- API requests require the exact portfolio Origin and a valid bearer session.
 - OAuth callback redirects to a fixed Knowledge Studio URL. No caller-provided redirect is accepted.
 - Private preview and chapter editing retrieve JSON through authenticated Worker routes.
+- The GitHub write token is a Worker secret and is never exposed to browser JavaScript.
 - Markdown output is sanitized with DOMPurify before insertion into the page.
 - The repository is public. Draft JSON files are **not confidential**, even when hidden from the public library.
-- The Worker and Pages currently have different hostnames. The session cookie uses Secure and SameSite=None; browser third-party-cookie restrictions may still prevent sign-in. Prefer a same-site custom Worker domain for a production deployment.
 
 ## Cloudflare and GitHub setup (not yet performed)
 1. Create a Cloudflare Worker from `knowledge/worker/index.js`.
@@ -28,10 +29,10 @@ The starter Numerical Methods entry is a **draft placeholder**, not a completed 
 3. Create a GitHub OAuth App; its callback must exactly match the Worker URL plus `/auth/callback`.
 4. Add Worker secrets `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `GITHUB_TOKEN`.
 5. Use a fine-grained token restricted to this repository with **Contents: Read and write** only. Never commit it or expose it to browser JavaScript.
-6. Configure the Worker variables in `wrangler.toml`, including the callback URL and authorized login.
-7. For pre-merge testing, set `GITHUB_BRANCH` to `feature/knowledge-library-foundation`. The dashboard must not write to `main` while this PR remains unmerged.
-8. Deploy the Worker only after reviewing secrets, KV binding, OAuth callback, and allowed Origin.
-9. Set `window.KNOWLEDGE_API_BASE` in `knowledge/assets/config.js` to the verified Worker origin (no trailing slash).
+6. Configure the Worker source with the exact OAuth callback URL, administrator login allowlist, and KV binding.
+7. For pre-merge testing, keep repository writes fixed to `feature/knowledge-library-foundation`. Never write to `main` while this PR remains unmerged.
+8. Deploy the reviewed Worker code only after verifying secrets, KV binding, OAuth callback, administrator allowlist, and allowed Origin.
+9. `knowledge/assets/config.js` points to the deployed Worker origin; verify it before Pages deployment.
 10. Confirm the deployed Worker only accepts `https://ashfakur-rahman.github.io` for API CORS and Origin checks.
 
 ## End-to-end verification
