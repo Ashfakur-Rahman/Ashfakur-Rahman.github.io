@@ -1,5 +1,5 @@
 const API_BASE = window.KNOWLEDGE_API_BASE || "";
-const CATALOG = "../content/catalog.json";
+const CATALOG = API_BASE + "/studio/content/catalog.json";
 const SESSION_KEY = "knowledge_studio_session";
 const readToken = () => sessionStorage.getItem(SESSION_KEY) || "";
 let catalog = { schemaVersion: 1, books: [] };
@@ -203,7 +203,7 @@ $("publish").onclick = async () => {
 };
 $("preview-public").onclick = () => {
   if (mode !== "chapter" || !selectedBook || !selectedChapter) { message("Save the chapter first, then open its private preview."); return; }
-  window.open("../book.html?book=" + encodeURIComponent(selectedBook) + "&chapter=" + encodeURIComponent(selectedChapter) + "&preview=1", "_blank", "noopener");
+  window.open("/studio/book.html?book=" + encodeURIComponent(selectedBook) + "&chapter=" + encodeURIComponent(selectedChapter) + "&preview=1", "_blank", "noopener");
 };
 $("logout").onclick = async () => { try { await api("/auth/logout", { method: "POST" }); } catch (error) { message(error.message); } finally { sessionStorage.removeItem(SESSION_KEY); location.reload(); } };
 (async () => {
