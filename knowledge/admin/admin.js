@@ -222,6 +222,7 @@ async function saveBook(status) {
   const next = { ...catalog, books: old ? catalog.books.map(book => book.slug === bookSlug ? item : book) : [...catalog.books, item] };
   await writeFile("knowledge/content/catalog.json", JSON.stringify(next, null, 2));
   catalog = next;
+  if (status === "published") await api("/api/publish", { method: "POST", body: JSON.stringify({ type: "book", slug: bookSlug }) });
   selectedBook = bookSlug;
   renderBooks();
   $("save-state").textContent = status;
@@ -247,6 +248,7 @@ async function saveChapter(status) {
   const next = { ...catalog, books: catalog.books.map(item => item.slug === bookSlug ? { ...item, chapters, chapterCount: chapters.length } : item) };
   await writeFile("knowledge/content/catalog.json", JSON.stringify(next, null, 2));
   catalog = next;
+  if (status === "published") await api("/api/publish", { method: "POST", body: JSON.stringify({ type: "chapter", slug: chapterSlug }) });
   selectedChapter = chapterSlug;
   selectedBook = bookSlug;
   renderBooks();
@@ -337,6 +339,26 @@ document.querySelectorAll("[data-editor-lang]").forEach(button => button.addEven
 $("save-draft").onclick = async () => {
   try { mode === "book" ? await saveBook("draft") : await saveChapter("draft"); }
   catch (error) { message(error.message); }
+};
+$("unpublish").onclick = async () => {
+  const type = mode === "book" ? "book" : "chapter";
+  const slugToUnpublish = type === "book" ? selectedBook : selectedChapter;
+  if (!slugToUnpublish) { message("Select a saved book or chapter first."); return; }
+  if (!confirm("Remove this " + type + " from the public library?")) return;
+  try {
+    await api("/api/unpublish", { method: "POST", body: JSON.stringify({ type, slug: slugToUnpublish }) });
+    if (type === "book") {
+      const book = catalog.books.find(item => item.slug === slugToUnpublish);
+      if (book) book.status = "draft";
+    } else {
+      const book = catalog.books.find(item => (item.chapters || []).some(ch => ch.slug === slugToUnpublish));
+      const chapter = book?.chapters.find(ch => ch.slug === slugToUnpublish);
+      if (chapter) chapter.status = "draft";
+    }
+    renderBooks();
+    $("save-state").textContent = "draft";
+    message("Unpublished. The content remains saved privately.");
+  } catch (error) { message(error.message); }
 };
 $("publish").onclick = async () => {
   if (!confirm("Publish this reviewed content to the public Knowledge Library?")) return;
