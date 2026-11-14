@@ -206,6 +206,7 @@ async function writeFile(path, content) {
   return api("/api/write", { method: "POST", body: JSON.stringify({ path, content, message: "Knowledge Studio: update " + path }) });
 }
 async function saveBook(status) {
+  clearTimeout(autosaveTimer);
   const titleEn = $("book-title-en").value.trim();
   if (!titleEn) throw Error("English book title is required.");
   const bookSlug = selectedBook || slug(titleEn);
@@ -230,6 +231,7 @@ async function saveBook(status) {
   message(status === "published" ? "Book published." : "Book draft saved.");
 }
 async function saveChapter(status) {
+  clearTimeout(autosaveTimer);
   chapterDraft[editorLang] = editorContent();
   const bookSlug = $("chapter-book").value;
   const book = catalog.books.find(item => item.slug === bookSlug);
