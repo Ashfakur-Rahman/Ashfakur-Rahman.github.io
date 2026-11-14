@@ -1,5 +1,5 @@
 const API_BASE = window.KNOWLEDGE_API_BASE || "";
-const CATALOG = API_BASE + "/studio/content/catalog.json";
+const CATALOG = API_BASE + "/api/catalog";
 const SESSION_KEY = "knowledge_studio_session";
 const readToken = () => sessionStorage.getItem(SESSION_KEY) || "";
 let catalog = { schemaVersion: 1, books: [] };
@@ -34,9 +34,7 @@ async function api(path, options = {}) {
   return response.status === 204 ? null : response.json();
 }
 async function loadCatalog() {
-  const response = await fetch(CATALOG + "?v=" + Date.now(), { cache: "no-store" });
-  if (!response.ok) throw Error("Could not load the content catalog.");
-  catalog = await response.json();
+  catalog = await api("/api/catalog");
   renderBooks();
   $("chapter-book").innerHTML = catalog.books.map(book => '<option value="' + esc(book.slug) + '">' + esc(book.title.en) + "</option>").join("");
 }
