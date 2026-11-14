@@ -1,53 +1,56 @@
-# Knowledge Library — implementation foundation
+# Knowledge Library — deployment and testing guide
 
-This repository is a plain HTML/CSS/JavaScript GitHub Pages portfolio. The Knowledge Library is added as an isolated section under `/knowledge/`; the existing portfolio page and its visual system remain in place.
-
-## Current architecture
-
-- Public library: `knowledge/index.html`
-- Book/chapter reader: `knowledge/book.html`
+## Architecture
+- Public bookshelf: `knowledge/index.html`
+- Public reader and authenticated author preview: `knowledge/book.html`
 - Custom author dashboard: `knowledge/admin/`
+- Shared API configuration: `knowledge/assets/config.js`
 - Content catalog: `knowledge/content/catalog.json`
-- Chapter content: `knowledge/content/chapters/<slug>.json`
-- Secure write API: Cloudflare Worker source in `knowledge/worker/`
+- Chapter JSON: `knowledge/content/chapters/<slug>.json`
+- OAuth, private preview and repository writes: `knowledge/worker/index.js`
 
-Content is data-driven. Creating a book or chapter in the dashboard updates JSON content records; the public pages render published records from the catalog. The starter Numerical Methods entry is deliberately a **draft placeholder**, not a completed book.
+The starter Numerical Methods entry is a **draft placeholder**, not a completed book.
 
-## Security model
+## Security model and limitations
+- GitHub OAuth identifies the author; the Worker allowlists `ADMIN_GITHUB_LOGIN`.
+- One-time OAuth state and session identifiers are stored in KV.
+- The GitHub write token is a Worker secret and is never exposed to the browser.
+- API requests require the exact portfolio Origin.
+- OAuth callback redirects to a fixed Knowledge Studio URL. No caller-provided redirect is accepted.
+- Private preview and chapter editing retrieve JSON through authenticated Worker routes.
+- Markdown output is sanitized with DOMPurify before insertion into the page.
+- The repository is public. Draft JSON files are **not confidential**, even when hidden from the public library.
+- The Worker and Pages currently have different hostnames. The session cookie uses Secure and SameSite=None; browser third-party-cookie restrictions may still prevent sign-in. Prefer a same-site custom Worker domain for a production deployment.
 
-GitHub Pages cannot securely authenticate an author or store a write token. The custom dashboard therefore delegates authentication and repository writes to a Cloudflare Worker:
-
-1. GitHub OAuth identifies the author.
-2. The Worker allowlists the configured GitHub username.
-3. A server-side KV session stores the login session.
-4. A fine-grained GitHub token is stored only as a Worker secret and writes only to this repository.
-5. The browser never receives the GitHub write token.
-
-Draft content is excluded from the public library navigation, but this first version stores JSON files in a public repository. **Drafts are therefore not confidential** and must not contain private or sensitive material.
-
-## One-time deployment setup
-
+## Cloudflare and GitHub setup (not yet performed)
 1. Create a Cloudflare Worker from `knowledge/worker/index.js`.
-2. Create a KV namespace named `SESSIONS`; put its ID in `wrangler.toml`.
-3. Create a GitHub OAuth App. Set its callback URL to the Worker URL plus `/auth/callback`.
-4. Configure Worker secrets: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `GITHUB_TOKEN`.
-5. The fine-grained GitHub token should be limited to this repository with **Contents: Read and write** only.
-6. Configure Worker variables from `wrangler.toml`, including the Worker callback URL and the authorized GitHub login.
-7. Deploy the Worker.
-8. Replace `API_BASE` in `knowledge/admin/admin.js` with the deployed Worker URL.
-9. Test GitHub sign-in, saving a draft, previewing it, and publishing a test chapter.
+2. Create a KV namespace named `SESSIONS` and replace the placeholder ID in `knowledge/worker/wrangler.toml`.
+3. Create a GitHub OAuth App; its callback must exactly match the Worker URL plus `/auth/callback`.
+4. Add Worker secrets `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `GITHUB_TOKEN`.
+5. Use a fine-grained token restricted to this repository with **Contents: Read and write** only. Never commit it or expose it to browser JavaScript.
+6. Configure the Worker variables in `wrangler.toml`, including the callback URL and authorized login.
+7. For pre-merge testing, set `GITHUB_BRANCH` to `feature/knowledge-library-foundation`. The dashboard must not write to `main` while this PR remains unmerged.
+8. Deploy the Worker only after reviewing secrets, KV binding, OAuth callback, and allowed Origin.
+9. Set `window.KNOWLEDGE_API_BASE` in `knowledge/assets/config.js` to the verified Worker origin (no trailing slash).
+10. Confirm the deployed Worker only accepts `https://ashfakur-rahman.github.io` for API CORS and Origin checks.
 
-## Author workflow
+## End-to-end verification
+Use a disposable test book and chapter.
+1. Authorized GitHub sign-in succeeds; an unauthorized account is rejected.
+2. Invalid, expired, and replayed OAuth state fails. Callback always returns to the fixed admin URL.
+3. Dashboard session survives reload; logout invalidates it.
+4. Create a test book and chapter in English and Bangla. Verify writes land on the feature branch.
+5. Select an existing chapter in the sidebar, edit both languages, save, reload, and verify the update.
+6. Private preview works when signed in and is denied in a logged-out/private browser.
+7. Draft books and chapters remain absent from the public bookshelf and public reader.
+8. Publish the test book before its chapter, then verify public visibility after Pages deployment.
+9. Test harmless script/HTML payloads in Markdown; no script should execute.
+10. Test sign-in in current Chrome, Firefox, and Safari privacy settings; cross-site cookie blocking is a known deployment risk.
 
-- **New book** → enter metadata → Save draft.
-- **New chapter** → select parent book → write English and Bangla → Save draft.
-- Review the preview carefully.
-- **Publish** only after checking the content. Published items appear in the public library.
-- Keep slugs stable after publication because they form permanent URLs.
+## Publishing workflow
+Create/edit → Save draft → authenticated private preview → review both languages and math → publish the parent book → publish chapters. Public changes appear after the Pages deployment completes.
 
-## Known MVP boundaries
-
-- The reader currently supports Markdown and KaTeX rendering.
-- Image upload/media management, chapter editing from the sidebar, automatic table of contents, full-text search, and a richer WYSIWYG editor are planned follow-up features.
-- The dashboard currently creates books and chapters and persists their metadata/content; the public reader is intentionally simple.
-- Because GitHub Pages serves a static site, public changes appear after the GitHub Pages deployment completes.
+## Boundaries
+- Image uploads, WYSIWYG editing, automatic TOC, and full-text search are not implemented.
+- Drafts in this public repository are unlisted, not private.
+- During testing, Worker writes target the feature branch. After PR review and merge, changing `GITHUB_BRANCH` to `main` is a separate configuration step.
