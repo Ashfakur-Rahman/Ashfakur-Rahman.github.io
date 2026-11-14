@@ -30,8 +30,11 @@ async function loadPreview() {
   const apiBase = window.KNOWLEDGE_API_BASE || "";
   if (!apiBase || apiBase.includes("YOUR-KNOWLEDGE-WORKER")) throw Error("Private preview is not configured.");
   const response = await fetch(apiBase + "/api/preview?book=" + encodeURIComponent(bookSlug) + "&chapter=" + encodeURIComponent(chapterSlug), {
-    credentials: "include",
-    headers: { Accept: "application/json" },
+    credentials: "omit",
+    headers: {
+      Accept: "application/json",
+      Authorization: "Bearer " + (sessionStorage.getItem("knowledge_studio_session") || "")
+    },
     cache: "no-store"
   });
   const data = await response.json();
