@@ -84,7 +84,7 @@ function renderMathFallback(root) {
     if (node.parentElement?.closest("pre, code, .katex")) continue;
     if (/\\\(|\\\[|\$\$/.test(node.nodeValue || "")) nodes.push(node);
   }
-  const pattern = /\\\((.+?)\\\)|\\\[(.+?)\\\]|\$\$(.+?)\$\$/gs;
+  const pattern = /\\\[(.+?)\\\]|\$\$(.+?)\$\$|\$(?!\$)(.+?)(?<!\\)\$/gs;
   for (const node of nodes) {
     const source = node.nodeValue || "";
     pattern.lastIndex = 0;
@@ -94,7 +94,7 @@ function renderMathFallback(root) {
     while ((match = pattern.exec(source))) {
       changed = true;
       if (match.index > cursor) fragment.append(document.createTextNode(source.slice(cursor, match.index)));
-      const display = match[2] !== undefined || match[3] !== undefined;
+      const display = match[1] !== undefined || match[2] !== undefined;
       const expression = match[1] ?? match[2] ?? match[3];
       const holder = document.createElement(display ? "div" : "span");
       try { katex.render(expression, holder, { displayMode: display, throwOnError: false, trust: false }); }
@@ -122,7 +122,7 @@ function render() {
   content.innerHTML = safeMarkdown(raw);
   if (window.renderMathInElement) {
     renderMathInElement(content, {
-      delimiters: [{ left: "$", right: "$", display: true }, { left: "\\(", right: "\\)", display: false }, { left: "\\[", right: "\\]", display: true }],
+      delimiters: [{ left: "$", right: "$", display: true }, { left: "$", right: "$", display: false }, { left: "\\[", right: "\\]", display: true }],
       throwOnError: false
     });
   } else {
