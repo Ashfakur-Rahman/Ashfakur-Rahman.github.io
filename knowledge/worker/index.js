@@ -1,5 +1,6 @@
 const SITE_ORIGIN = "https://ashfakur-rahman.github.io";
-const ADMIN_URL = SITE_ORIGIN + "/knowledge/admin/";
+const WORKER_ORIGIN = "https://knowledge-library-auth.ashfakurrahman79.workers.dev";
+const ADMIN_URL = WORKER_ORIGIN + "/studio/";
 const REPO_OWNER = "Ashfakur-Rahman";
 const REPO_NAME = "Ashfakur-Rahman.github.io";
 const REPO_BRANCH = "feature/knowledge-library-foundation";
@@ -169,18 +170,69 @@ async function handleApi(request, env, url) {
   return json({ error: "Not found." }, 404);
 }
 
+
+async function serveStudio(request, env, url) {
+  const routes = {
+    "/studio/": ["knowledge/admin/index.html", "text/html; charset=utf-8"],
+    "/studio/index.html": ["knowledge/admin/index.html", "text/html; charset=utf-8"],
+    "/studio/admin.js": ["knowledge/admin/admin.js", "text/javascript; charset=utf-8"],
+    "/studio/admin.css": ["knowledge/admin/admin.css", "text/css; charset=utf-8"],
+    "/studio/book.html": ["knowledge/book.html", "text/html; charset=utf-8"],
+    "/studio/assets/library.css": ["knowledge/assets/library.css", "text/css; charset=utf-8"],
+    "/studio/assets/config.js": ["knowledge/assets/config.js", "text/javascript; charset=utf-8"],
+    "/studio/assets/reader.js": ["knowledge/assets/reader.js", "text/javascript; charset=utf-8"],
+    "/studio/content/catalog.json": ["knowledge/content/catalog.json", "application/json; charset=utf-8"]
+  };
+  let entry = routes[url.pathname];
+  if (!entry) {
+    const chapterMatch = url.pathname.match(/^\/studio\/content\/chapters\/([a-z0-9-]{1,70})\.json$/);
+    if (chapterMatch) entry = ["knowledge/content/chapters/" + chapterMatch[1] + ".json", "application/json; charset=utf-8"];
+  }
+  if (!entry) return null;
+  const file = await githubRequest(
+    env,
+    "/repos/" + REPO_OWNER + "/" + REPO_NAME + "/contents/" + entry[0] + "?ref=" + encodeURIComponent(REPO_BRANCH)
+  );
+  let body = decodeBase64(file.content);
+  if (url.pathname === "/studio/" || url.pathname === "/studio/index.html") {
+    body = body
+      .replace('href="../"', 'href="https://ashfakur-rahman.github.io/knowledge/"')
+      .replace('href="../../"', 'href="https://ashfakur-rahman.github.io/"')
+      .replace('href="../assets/library.css"', 'href="/studio/assets/library.css"')
+      .replace('href="./admin.css"', 'href="/studio/admin.css"')
+      .replace('src="../assets/config.js"', 'src="/studio/assets/config.js"')
+      .replace('src="./admin.js"', 'src="/studio/admin.js"');
+  }
+  if (url.pathname === "/studio/book.html") {
+    body = body
+      .replace('href="../"', 'href="https://ashfakur-rahman.github.io/"')
+      .replace('href="./"', 'href="/studio/"')
+      .replace('href="./assets/library.css"', 'href="/studio/assets/library.css"')
+      .replace('src="./assets/config.js"', 'src="/studio/assets/config.js"')
+      .replace('src="./assets/reader.js"', 'src="/studio/assets/reader.js"');
+  }
+  return new Response(body, {
+    status: 200,
+    headers: {
+      "Content-Type": entry[1],
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff"
+    }
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const origin = request.headers.get("Origin");
 
     if (request.method === "OPTIONS") {
-      if (origin !== SITE_ORIGIN) return new Response(null, { status: 403 });
+      if (origin !== SITE_ORIGIN && origin !== WORKER_ORIGIN) return new Response(null, { status: 403 });
       return new Response(null, { status: 204, headers: corsHeaders() });
     }
 
     if (url.pathname.startsWith("/api/") || url.pathname === "/auth/exchange" || url.pathname === "/auth/logout") {
-      if (origin !== SITE_ORIGIN) return json({ error: "Origin not allowed." }, 403);
+      if (origin !== SITE_ORIGIN && origin !== WORKER_ORIGIN) return json({ error: "Origin not allowed." }, 403);
     }
 
     try {
@@ -280,6 +332,10 @@ export default {
       }
 
       if (url.pathname.startsWith("/api/")) return await handleApi(request, env, url);
+      if (url.pathname === "/studio/" || url.pathname.startsWith("/studio/")) {
+        const studioResponse = await serveStudio(request, env, url);
+        if (studioResponse) return studioResponse;
+      }
       if (url.pathname === "/") return new Response("Knowledge Library authentication service", {
         headers: { "Content-Type": "text/plain; charset=utf-8" }
       });
