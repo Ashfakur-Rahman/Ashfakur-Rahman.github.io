@@ -18,12 +18,60 @@ function normalizeMarkdown(value = "") {
   source = source.replace(/\\\\([()])/g, "\\$1");
   return source;
 }
+function markdownInline(value) {
+  let html = esc(value);
+  const tick = String.fromCharCode(96);
+  html = html.replace(new RegExp(tick + "([^" + tick + "]+)" + tick, "g"), "<code>$1</code>");
+  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/__([^_]+)__/g, "<strong>$1</strong>");
+  html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  html = html.replace(/_([^_]+)_/g, "<em>$1</em>");
+  html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  return html;
+}
+function basicMarkdown(source) {
+  const lines = normalizeMarkdown(source).replace(/\r/g, "").split("\n");
+  const out = [];
+  let paragraph = [], list = "", quote = [], code = [];
+  const flushParagraph = () => { if (paragraph.length) { out.push("<p>" + paragraph.map(markdownInline).join("<br>") + "</p>"); paragraph = []; } };
+  const flushList = () => { if (list) { out.push("</" + list + ">"); list = ""; } };
+  const flushQuote = () => { if (quote.length) { out.push("<blockquote>" + basicMarkdown(quote.join("\n")) + "</blockquote>"); quote = []; } };
+  const flushCode = () => { if (code.length) { out.push("<pre><code>" + esc(code.join("\n")) + "</code></pre>"); code = []; } };
+  let inCode = false;
+  for (const line of lines) {
+    if (line.trim().startsWith("~~~")) {
+      flushParagraph(); flushList(); flushQuote();
+      if (inCode) { flushCode(); inCode = false; } else inCode = true;
+      continue;
+    }
+    if (line.trim().startsWith(String.fromCharCode(96).repeat(3))) {
+      flushParagraph(); flushList(); flushQuote();
+      if (inCode) { flushCode(); inCode = false; } else inCode = true;
+      continue;
+    }
+    if (inCode) { code.push(line); continue; }
+    const heading = line.match(/^(#{1,6})\s+(.+)$/);
+    const bullet = line.match(/^\s*[-*+]\s+(.+)$/);
+    const numbered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+    if (heading) { flushParagraph(); flushList(); flushQuote(); const level = heading[1].length; out.push("<h" + level + ">" + markdownInline(heading[2]) + "</h" + level + ">"); }
+    else if (bullet || numbered) {
+      flushParagraph(); flushQuote();
+      const next = bullet ? "ul" : "ol";
+      if (list !== next) { flushList(); list = next; out.push("<" + list + ">"); }
+      out.push("<li>" + markdownInline((bullet || numbered)[1]) + "</li>");
+    } else if (/^\s*>/.test(line)) { flushParagraph(); flushList(); quote.push(line.replace(/^\s*>\s?/, "")); }
+    else if (/^\s*(---+|\*\*\*+)\s*$/.test(line)) { flushParagraph(); flushList(); flushQuote(); out.push("<hr>"); }
+    else if (!line.trim()) { flushParagraph(); flushList(); flushQuote(); }
+    else { flushList(); flushQuote(); paragraph.push(line); }
+  }
+  if (inCode) flushCode();
+  flushParagraph(); flushList(); flushQuote();
+  return out.join("\n");
+}
 function safeMarkdown(markdown) {
   const source = normalizeMarkdown(markdown);
-  if (!window.marked || !window.DOMPurify) {
-    return "<pre class=\"markdown-unavailable\">" + esc(source) + "</pre>";
-  }
-  return DOMPurify.sanitize(marked.parse(source));
+  const html = window.marked ? marked.parse(source) : basicMarkdown(source);
+  return window.DOMPurify ? DOMPurify.sanitize(html) : basicMarkdown(source);
 }
 function render() {
   document.querySelector("#chapter-title").textContent = chapterData.title?.[lang] || chapterData.title?.en || "";
