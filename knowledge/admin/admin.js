@@ -203,7 +203,9 @@ $("publish").onclick = async () => {
 };
 $("preview-public").onclick = () => {
   if (mode !== "chapter" || !selectedBook || !selectedChapter) { message("Save the chapter first, then open its private preview."); return; }
-  window.open("/studio/book.html?book=" + encodeURIComponent(selectedBook) + "&chapter=" + encodeURIComponent(selectedChapter) + "&preview=1", "_blank", "noopener");
+  // Keep the preview in this tab so its sessionStorage bearer token remains available.
+  // The browser does not reliably copy sessionStorage to a noopener tab.
+  location.assign("/studio/book.html?book=" + encodeURIComponent(selectedBook) + "&chapter=" + encodeURIComponent(selectedChapter) + "&preview=1");
 };
 $("logout").onclick = async () => { try { await api("/auth/logout", { method: "POST" }); } catch (error) { message(error.message); } finally { sessionStorage.removeItem(SESSION_KEY); location.reload(); } };
 (async () => {
