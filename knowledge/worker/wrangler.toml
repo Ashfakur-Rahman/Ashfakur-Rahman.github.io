@@ -1,4 +1,4 @@
-name = "ashfakur-knowledge-api"
+name = "knowledge-library-auth"
 main = "index.js"
 compatibility_date = "2026-11-14"
 
@@ -11,4 +11,4 @@ GITHUB_OWNER = "Ashfakur-Rahman"
 GITHUB_REPO = "Ashfakur-Rahman.github.io"
 GITHUB_BRANCH = "feature/knowledge-library-foundation"
 ADMIN_GITHUB_LOGIN = "Ashfakur-Rahman"
-OAUTH_CALLBACK_URL = "https://YOUR-WORKER.workers.dev/auth/callback"
+OAUTH_CALLBACK_URL = "https://knowledge-library-auth.ashfakurrahman79.workers.dev/auth/callback"
