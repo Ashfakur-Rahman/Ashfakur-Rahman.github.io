@@ -122,9 +122,14 @@ function syncLangTabs() {
 function updatePreview() {
   chapterDraft[editorLang] = $("chapter-body").value;
   const target = $("preview");
-  const markdown = chapterDraft[editorLang] || "_Nothing to preview yet._";
-  const html = window.marked ? marked.parse(markdown) : esc(markdown).replace(/\n/g, "<br>");
-  target.innerHTML = window.DOMPurify ? DOMPurify.sanitize(html) : esc(markdown).replace(/\n/g, "<br>");
+  let markdown = chapterDraft[editorLang] || "_Nothing to preview yet._";
+  if (!markdown.includes("\n") && /\\n/.test(markdown)) markdown = markdown.replace(/\\r?\\n/g, "\n");
+  markdown = markdown.replace(/\\\\([()])/g, "\\$1");
+  if (!window.marked || !window.DOMPurify) {
+    target.textContent = markdown;
+    return;
+  }
+  target.innerHTML = DOMPurify.sanitize(marked.parse(markdown));
   if (window.renderMathInElement) renderMathInElement(target, {
     delimiters: [{ left: "$$", right: "$$", display: true }, { left: "\\(", right: "\\)", display: false }],
     throwOnError: false
