@@ -76,8 +76,15 @@ function safeMarkdown(markdown) {
   return window.DOMPurify ? DOMPurify.sanitize(html) : basicMarkdown(source);
 }
 function render() {
-  document.querySelector("#chapter-title").textContent = chapterData.title?.[lang] || chapterData.title?.en || "";
-  const raw = chapterData.content?.[lang] || chapterData.content?.en || "_This chapter is not available in this language yet._";
+  const chapterTitle = chapterData.title?.[lang] || chapterData.title?.en || "";
+  document.querySelector("#chapter-title").textContent = chapterTitle;
+  let raw = chapterData.content?.[lang] || chapterData.content?.en || "_This chapter is not available in this language yet._";
+  raw = normalizeMarkdown(raw);
+  // Avoid repeating the chapter title when authors include it as the first Markdown H1.
+  const firstHeading = raw.match(/^\s*#\s+(.+?)\s*(?:\n|$)/);
+  if (firstHeading && firstHeading[1].trim().toLocaleLowerCase() === String(chapterTitle).trim().toLocaleLowerCase()) {
+    raw = raw.replace(/^\s*#\s+.+?(?:\n|$)/, "");
+  }
   const content = document.querySelector("#chapter-content");
   content.innerHTML = safeMarkdown(raw);
   if (window.renderMathInElement) renderMathInElement(content, {
