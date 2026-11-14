@@ -1,5 +1,7 @@
 const API_BASE = window.KNOWLEDGE_API_BASE || "";
 const CATALOG = "../content/catalog.json";
+const SESSION_KEY = "knowledge_studio_session";
+const readToken = () => sessionStorage.getItem(SESSION_KEY) || "";
 let catalog = { schemaVersion: 1, books: [] };
 let mode = "book";
 let selectedBook = null;
@@ -21,8 +23,8 @@ async function api(path, options = {}) {
   if (!API_BASE || API_BASE.includes("YOUR-KNOWLEDGE-WORKER")) throw Error("Knowledge API is not configured.");
   const response = await fetch(API_BASE + path, {
     ...options,
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) }
+    credentials: "omit",
+    headers: { "Content-Type": "application/json", ...(readToken() ? { Authorization: "Bearer " + readToken() } : {}), ...(options.headers || {}) }
   });
   if (!response.ok) {
     let detail = "";
@@ -203,9 +205,23 @@ $("preview-public").onclick = () => {
   if (mode !== "chapter" || !selectedBook || !selectedChapter) { message("Save the chapter first, then open its private preview."); return; }
   window.open("../book.html?book=" + encodeURIComponent(selectedBook) + "&chapter=" + encodeURIComponent(selectedChapter) + "&preview=1", "_blank", "noopener");
 };
-$("logout").onclick = async () => { try { await api("/auth/logout", { method: "POST" }); } catch (error) { message(error.message); } finally { location.reload(); } };
+$("logout").onclick = async () => { try { await api("/auth/logout", { method: "POST" }); } catch (error) { message(error.message); } finally { sessionStorage.removeItem(SESSION_KEY); location.reload(); } };
 (async () => {
   try {
+    const hash = new URLSearchParams(location.hash.slice(1));
+    const authCode = hash.get("auth_code");
+    if (authCode) {
+      history.replaceState(null, "", location.pathname + location.search);
+      const exchange = await fetch(API_BASE + "/auth/exchange", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "omit",
+        body: JSON.stringify({ code: authCode })
+      });
+      const exchanged = await exchange.json();
+      if (!exchange.ok || !exchanged.token) throw Error(exchanged.error || "Could not complete sign-in.");
+      sessionStorage.setItem(SESSION_KEY, exchanged.token);
+    }
     const session = await api("/api/session");
     if (!session.authenticated) throw Error("Please sign in.");
     $("login-panel").hidden = true;
