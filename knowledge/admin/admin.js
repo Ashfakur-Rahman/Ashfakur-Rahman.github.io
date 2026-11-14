@@ -113,9 +113,17 @@ async function editChapter(bookSlug, chapterSlug) {
     updatePreview();
   } catch (error) { message(error.message); }
 }
+function editorContent() {
+  return "<!--knowledge-html-->\\n" + $("chapter-body").innerHTML;
+}
+function showEditorContent(value = "") {
+  const source = String(value || "");
+  if (source.startsWith("<!--knowledge-html-->")) $("chapter-body").innerHTML = source.replace(/^<!--knowledge-html-->\\n?/, "");
+  else $("chapter-body").innerHTML = window.marked ? marked.parse(normalizeMarkdown(source)) : basicMarkdown(source);
+}
 function syncLangTabs() {
   document.querySelectorAll("[data-editor-lang]").forEach(button => button.classList.toggle("selected", button.dataset.editorLang === editorLang));
-  $("chapter-body").value = chapterDraft[editorLang] || "";
+  showEditorContent(chapterDraft[editorLang] || "");
 }
 function normalizeMarkdown(value = "") {
   let source = String(value);
@@ -178,11 +186,13 @@ function basicMarkdown(source) {
   return out.join("\n");
 }
 function updatePreview() {
-  chapterDraft[editorLang] = $("chapter-body").value;
+  chapterDraft[editorLang] = editorContent();
   const target = $("preview");
-  const markdown = normalizeMarkdown(chapterDraft[editorLang] || "_Nothing to preview yet._");
-  const html = window.marked ? marked.parse(markdown) : basicMarkdown(markdown);
-  target.innerHTML = window.DOMPurify ? DOMPurify.sanitize(html) : basicMarkdown(markdown);
+  const source = chapterDraft[editorLang] || "_Nothing to preview yet._";
+  const isHtml = source.startsWith("<!--knowledge-html-->");
+  const markdown = normalizeMarkdown(source);
+  const html = isHtml ? source.replace(/^<!--knowledge-html-->\\n?/, "") : (window.marked ? marked.parse(markdown) : basicMarkdown(markdown));
+  target.innerHTML = window.DOMPurify ? DOMPurify.sanitize(html) : (isHtml ? "" : basicMarkdown(markdown));
   if (window.renderMathInElement) renderMathInElement(target, {
     delimiters: [{ left: "$", right: "$", display: true }, { left: "$", right: "$", display: false }, { left: "\\[", right: "\\]", display: true }],
     throwOnError: false
@@ -215,7 +225,7 @@ async function saveBook(status) {
   message(status === "published" ? "Book published." : "Book draft saved.");
 }
 async function saveChapter(status) {
-  chapterDraft[editorLang] = $("chapter-body").value;
+  chapterDraft[editorLang] = editorContent();
   const bookSlug = $("chapter-book").value;
   const book = catalog.books.find(item => item.slug === bookSlug);
   const titleEn = $("chapter-title-en").value.trim();
@@ -247,7 +257,7 @@ $("login").onclick = () => {
 $("new-book").onclick = newBook;
 $("new-chapter").onclick = newChapter;
 $("refresh-preview").onclick = updatePreview;
-$("chapter-body").addEventListener("input", () => { chapterDraft[editorLang] = $("chapter-body").value; });
+$("chapter-body").addEventListener("input", () => { chapterDraft[editorLang] = editorContent(); updatePreview(); $("save-state").textContent = "Unsaved changes"; });
 document.querySelectorAll("[data-editor-lang]").forEach(button => button.addEventListener("click", () => {
   chapterDraft[editorLang] = $("chapter-body").value;
   editorLang = button.dataset.editorLang;
