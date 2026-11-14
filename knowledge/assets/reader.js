@@ -75,6 +75,39 @@ function safeMarkdown(markdown) {
   const html = window.marked ? marked.parse(source) : basicMarkdown(source);
   return window.DOMPurify ? DOMPurify.sanitize(html) : basicMarkdown(source);
 }
+function renderMathFallback(root) {
+  if (!window.katex) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    if (node.parentElement?.closest("pre, code, .katex")) continue;
+    if (/\\\(|\\\[|\$\$/.test(node.nodeValue || "")) nodes.push(node);
+  }
+  const pattern = /\\\((.+?)\\\)|\\\[(.+?)\\\]|\$\$(.+?)\$\$/gs;
+  for (const node of nodes) {
+    const source = node.nodeValue || "";
+    pattern.lastIndex = 0;
+    let match, cursor = 0;
+    const fragment = document.createDocumentFragment();
+    let changed = false;
+    while ((match = pattern.exec(source))) {
+      changed = true;
+      if (match.index > cursor) fragment.append(document.createTextNode(source.slice(cursor, match.index)));
+      const display = match[2] !== undefined || match[3] !== undefined;
+      const expression = match[1] ?? match[2] ?? match[3];
+      const holder = document.createElement(display ? "div" : "span");
+      try { katex.render(expression, holder, { displayMode: display, throwOnError: false, trust: false }); }
+      catch (_) { holder.textContent = match[0]; }
+      fragment.append(holder);
+      cursor = pattern.lastIndex;
+    }
+    if (changed) {
+      if (cursor < source.length) fragment.append(document.createTextNode(source.slice(cursor)));
+      node.parentNode.replaceChild(fragment, node);
+    }
+  }
+}
 function render() {
   const chapterTitle = chapterData.title?.[lang] || chapterData.title?.en || "";
   document.querySelector("#chapter-title").textContent = chapterTitle;
@@ -87,10 +120,14 @@ function render() {
   }
   const content = document.querySelector("#chapter-content");
   content.innerHTML = safeMarkdown(raw);
-  if (window.renderMathInElement) renderMathInElement(content, {
-    delimiters: [{ left: "$$", right: "$$", display: true }, { left: "\\(", right: "\\)", display: false }],
-    throwOnError: false
-  });
+  if (window.renderMathInElement) {
+    renderMathInElement(content, {
+      delimiters: [{ left: "$", right: "$", display: true }, { left: "\\(", right: "\\)", display: false }, { left: "\\[", right: "\\]", display: true }],
+      throwOnError: false
+    });
+  } else {
+    renderMathFallback(content);
+  }
   document.querySelectorAll("[data-lang]").forEach(button => button.classList.toggle("selected", button.dataset.lang === lang));
 }
 document.querySelectorAll("[data-lang]").forEach(button => button.addEventListener("click", () => { lang = button.dataset.lang; render(); }));
