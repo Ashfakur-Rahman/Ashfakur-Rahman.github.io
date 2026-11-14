@@ -17,7 +17,7 @@ function randomToken(bytes = 32) {
 
 function corsHeaders() {
   return {
-    "Access-Control-Allow-Origin": SITE_ORIGIN,
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400",
@@ -227,13 +227,9 @@ export default {
     const origin = request.headers.get("Origin");
 
     if (request.method === "OPTIONS") {
-      if (origin !== SITE_ORIGIN && origin !== WORKER_ORIGIN) return new Response(null, { status: 403 });
       return new Response(null, { status: 204, headers: corsHeaders() });
     }
 
-    if (url.pathname.startsWith("/api/") || url.pathname === "/auth/exchange" || url.pathname === "/auth/logout") {
-      if (origin !== SITE_ORIGIN && origin !== WORKER_ORIGIN) return json({ error: "Origin not allowed." }, 403);
-    }
 
     try {
       if (url.pathname === "/auth/login" && request.method === "GET") {
