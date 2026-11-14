@@ -186,7 +186,7 @@ function updatePreview() {
   const html = window.marked ? marked.parse(markdown) : basicMarkdown(markdown);
   target.innerHTML = window.DOMPurify ? DOMPurify.sanitize(html) : basicMarkdown(markdown);
   if (window.renderMathInElement) renderMathInElement(target, {
-    delimiters: [{ left: "$$", right: "$$", display: true }, { left: "\\(", right: "\\)", display: false }],
+    delimiters: [{ left: "$", right: "$", display: true }, { left: "$", right: "$", display: false }, { left: "\\[", right: "\\]", display: true }],
     throwOnError: false
   });
 }
