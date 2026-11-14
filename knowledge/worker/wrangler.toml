@@ -1,0 +1,14 @@
+name = "ashfakur-knowledge-api"
+main = "index.js"
+compatibility_date = "2026-11-14"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[vars]
+GITHUB_OWNER = "Ashfakur-Rahman"
+GITHUB_REPO = "Ashfakur-Rahman.github.io"
+GITHUB_BRANCH = "main"
+ADMIN_GITHUB_LOGIN = "Ashfakur-Rahman"
+OAUTH_CALLBACK_URL = "https://YOUR-WORKER.workers.dev/auth/callback"
