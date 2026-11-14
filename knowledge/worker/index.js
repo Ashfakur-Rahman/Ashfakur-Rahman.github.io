@@ -92,84 +92,108 @@ async function requireSession(request, env) {
   return { token, user: JSON.parse(raw) };
 }
 
+
+const DRAFT_CATALOG_KEY = "content:draft:catalog";
+const PUBLIC_CATALOG_KEY = "content:published:catalog";
+const draftChapterKey = slug => "content:draft:chapter:" + slug;
+const publicChapterKey = slug => "content:published:chapter:" + slug;
+
+async function getDraftCatalog(env) {
+  let raw = await env.SESSIONS.get(DRAFT_CATALOG_KEY);
+  if (raw) return JSON.parse(raw);
+  // One-time bootstrap from the existing starter catalog. Subsequent edits stay in KV.
+  const legacy = await readRepoJson(env, "knowledge/content/catalog.json");
+  await env.SESSIONS.put(DRAFT_CATALOG_KEY, JSON.stringify(legacy));
+  return legacy;
+}
+
+async function getDraftChapter(env, slug) {
+  let raw = await env.SESSIONS.get(draftChapterKey(slug));
+  if (raw) return JSON.parse(raw);
+  const legacy = await readRepoJson(env, "knowledge/content/chapters/" + slug + ".json");
+  await env.SESSIONS.put(draftChapterKey(slug), JSON.stringify(legacy));
+  return legacy;
+}
+
+async function refreshPublishedCatalog(env, draft) {
+  const books = [];
+  for (const book of draft.books || []) {
+    if (book.status !== "published") continue;
+    const chapters = (book.chapters || []).filter(ch => ch.status === "published").sort((a,b)=>a.order-b.order);
+    if (!chapters.length) continue;
+    books.push({ ...book, chapters, chapterCount: chapters.length });
+  }
+  await env.SESSIONS.put(PUBLIC_CATALOG_KEY, JSON.stringify({ schemaVersion: 1, books }));
+}
+
+async function publicApi(url, env) {
+  if (url.pathname === "/public/catalog" && url.searchParams.get("v") !== "private") {
+    const raw = await env.SESSIONS.get(PUBLIC_CATALOG_KEY);
+    return json(raw ? JSON.parse(raw) : { schemaVersion: 1, books: [] });
+  }
+  if (url.pathname === "/public/chapter") {
+    const bookSlug = url.searchParams.get("book") || "";
+    const chapterSlug = url.searchParams.get("chapter") || "";
+    if (!/^[a-z0-9-]{1,70}$/.test(bookSlug) || !/^[a-z0-9-]{1,70}$/.test(chapterSlug)) return json({error:"Invalid book or chapter slug."},400);
+    const rawCatalog = await env.SESSIONS.get(PUBLIC_CATALOG_KEY);
+    const catalog = rawCatalog ? JSON.parse(rawCatalog) : {books:[]};
+    const book = (catalog.books || []).find(item=>item.slug===bookSlug);
+    const entry = book && (book.chapters || []).find(item=>item.slug===chapterSlug);
+    if (!book || !entry) return json({error:"This chapter is not published."},404);
+    const rawChapter = await env.SESSIONS.get(publicChapterKey(chapterSlug));
+    if (!rawChapter) return json({error:"Published chapter content is unavailable."},404);
+    return json({book,chapter:JSON.parse(rawChapter)});
+  }
+  return null;
+}
+
 async function handleApi(request, env, url) {
   const session = await requireSession(request, env);
   if (!session) return json({ authenticated: false, error: "Authentication required." }, 401);
+  if (url.pathname === "/api/session" && request.method === "GET") return json({ authenticated: true, login: session.user.login, user: session.user });
+  if (url.pathname === "/api/me" && request.method === "GET") return json({ authenticated: true, user: session.user });
 
-  if (url.pathname === "/api/session" && request.method === "GET") {
-    return json({ authenticated: true, login: session.user.login, user: session.user });
+  if (url.pathname === "/api/catalog" && request.method === "GET") {
+    const catalog = await getDraftCatalog(env);
+    return json(catalog);
   }
 
-  if (url.pathname === "/api/me" && request.method === "GET") {
-    return json({ authenticated: true, user: session.user });
-  }
-
-  if (url.pathname === "/api/chapter" && request.method === "GET") {
+  if ((url.pathname === "/api/chapter" || url.pathname === "/api/preview") && request.method === "GET") {
     const bookSlug = url.searchParams.get("book") || "";
     const chapterSlug = url.searchParams.get("chapter") || "";
-    if (!/^[a-z0-9-]{1,70}$/.test(bookSlug) || !/^[a-z0-9-]{1,70}$/.test(chapterSlug)) {
-      return json({ error: "Invalid book or chapter slug." }, 400);
-    }
-    const catalog = await readRepoJson(env, "knowledge/content/catalog.json");
+    if (!/^[a-z0-9-]{1,70}$/.test(bookSlug) || !/^[a-z0-9-]{1,70}$/.test(chapterSlug)) return json({ error: "Invalid book or chapter slug." }, 400);
+    const catalog = await getDraftCatalog(env);
     const book = (catalog.books || []).find(item => item.slug === bookSlug);
     const entry = book && (book.chapters || []).find(item => item.slug === chapterSlug);
     if (!book || !entry) return json({ error: "Book or chapter not found." }, 404);
-    const chapter = await readRepoJson(env, "knowledge/content/chapters/" + chapterSlug + ".json");
+    const chapter = await getDraftChapter(env, chapterSlug);
     if (chapter.book !== bookSlug) return json({ error: "Chapter does not belong to this book." }, 404);
-    return json({ book, chapter });
-  }
-
-  if (url.pathname === "/api/preview" && request.method === "GET") {
-    const bookSlug = url.searchParams.get("book") || "";
-    const chapterSlug = url.searchParams.get("chapter") || "";
-    if (!/^[a-z0-9-]{1,70}$/.test(bookSlug) || !/^[a-z0-9-]{1,70}$/.test(chapterSlug)) {
-      return json({ error: "Invalid book or chapter slug." }, 400);
-    }
-    const catalog = await readRepoJson(env, "knowledge/content/catalog.json");
-    const book = (catalog.books || []).find(item => item.slug === bookSlug);
-    const entry = book && (book.chapters || []).find(item => item.slug === chapterSlug);
-    if (!book || !entry) return json({ error: "Book or chapter not found." }, 404);
-    const chapter = await readRepoJson(env, "knowledge/content/chapters/" + chapterSlug + ".json");
-    if (chapter.book !== bookSlug) return json({ error: "Chapter does not belong to this book." }, 404);
-    return json({ preview: true, book, chapter });
+    return json(url.pathname === "/api/preview" ? { preview: true, book, chapter } : { book, chapter });
   }
 
   if (url.pathname === "/api/write" && request.method === "POST") {
     const body = await request.json().catch(() => null);
-    if (!body) return json({ error: "Invalid JSON body." }, 400);
+    if (!body || typeof body.content !== "string" || body.content.length > 900000) return json({ error: "Invalid or oversized content." }, 400);
     const path = String(body.path || "");
-    if (!/^knowledge\/content\/(catalog\.json|chapters\/[a-z0-9-]{1,70}\.json)$/.test(path)) {
-      return json({ error: "Path not allowed." }, 400);
+    let data;
+    try { data = JSON.parse(body.content); } catch (_) { return json({error:"Content must be valid JSON."},400); }
+    if (path === "knowledge/content/catalog.json") {
+      if (!Array.isArray(data.books)) return json({error:"Invalid catalog format."},400);
+      await env.SESSIONS.put(DRAFT_CATALOG_KEY, JSON.stringify(data));
+      await refreshPublishedCatalog(env, data);
+      return json({saved:true, storage:"private-kv"});
     }
-    if (typeof body.content !== "string" || body.content.length > 900000) {
-      return json({ error: "Invalid or oversized content." }, 400);
-    }
-
-    const apiPath = "/repos/" + REPO_OWNER + "/" + REPO_NAME + "/contents/" + path;
-    let existingSha;
-    try {
-      const existing = await githubRequest(env, apiPath + "?ref=" + encodeURIComponent(REPO_BRANCH));
-      existingSha = existing.sha;
-    } catch (error) {
-      if (!String(error.message).includes("GitHub API 404")) throw error;
-    }
-
-    const result = await githubRequest(env, apiPath, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: String(body.message || "Knowledge Studio: update " + path).slice(0, 120),
-        content: encodeBase64(body.content),
-        branch: REPO_BRANCH,
-        ...(existingSha ? { sha: existingSha } : {})
-      })
-    });
-    return json({ saved: true, path, branch: REPO_BRANCH, commit: result.commit?.sha });
+    const match = path.match(/^knowledge\/content\/chapters\/([a-z0-9-]{1,70})\.json$/);
+    if (!match || data.slug !== match[1] || !/^[a-z0-9-]{1,70}$/.test(data.book || "")) return json({error:"Path or chapter data is not allowed."},400);
+    await env.SESSIONS.put(draftChapterKey(match[1]), JSON.stringify(data));
+    if (data.status === "published") await env.SESSIONS.put(publicChapterKey(match[1]), JSON.stringify(data));
+    else await env.SESSIONS.delete(publicChapterKey(match[1]));
+    const catalog = await getDraftCatalog(env);
+    await refreshPublishedCatalog(env, catalog);
+    return json({saved:true, storage:"private-kv"});
   }
-
   return json({ error: "Not found." }, 404);
 }
-
 
 async function serveStudio(request, env, url) {
   const routes = {
@@ -327,6 +351,7 @@ export default {
         return json({ authenticated: false, message: "Logged out." });
       }
 
+      if (url.pathname.startsWith("/public/")) { const response = await publicApi(url, env); if (response) return response; }
       if (url.pathname.startsWith("/api/")) return await handleApi(request, env, url);
       if (url.pathname === "/studio/" || url.pathname.startsWith("/studio/")) {
         const studioResponse = await serveStudio(request, env, url);
