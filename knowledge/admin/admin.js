@@ -137,6 +137,7 @@ async function saveBook(status) {
   const bookSlug = selectedBook || slug(titleEn);
   if (!bookSlug) throw Error("A valid English title is required to create the book slug.");
   const old = catalog.books.find(book => book.slug === bookSlug);
+  if (!selectedBook && old) throw Error("A book with this slug already exists. Select it from the bookshelf to edit it.");
   const item = {
     ...(old || {}), slug: bookSlug, status,
     subject: $("book-subject").value.trim(), level: $("book-level").value,
@@ -163,6 +164,8 @@ async function saveChapter(status) {
   if (status === "published" && book.status !== "published") throw Error("Publish the parent book first, then publish this chapter.");
   const chapterSlug = selectedChapter || slug(titleEn);
   if (!chapterSlug) throw Error("A valid English title is required to create the chapter slug.");
+  const duplicateChapter = catalog.books.some(item => item.slug !== bookSlug && (item.chapters || []).some(chapter => chapter.slug === chapterSlug));
+  if (duplicateChapter) throw Error("Chapter slugs must be unique across the library. Choose a different English title.");
   const order = Number($("chapter-order").value) || 1;
   const data = { schemaVersion: 1, slug: chapterSlug, book: bookSlug, status, order, title: { en: titleEn, bn: $("chapter-title-bn").value.trim() }, content: chapterDraft };
   await writeFile("knowledge/content/chapters/" + chapterSlug + ".json", JSON.stringify(data, null, 2));
