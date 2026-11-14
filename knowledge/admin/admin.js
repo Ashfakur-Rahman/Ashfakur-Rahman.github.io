@@ -121,9 +121,9 @@ function syncLangTabs() {
 }
 function normalizeMarkdown(value = "") {
   let source = String(value);
-  // Legacy chapter JSON contains literal backslash-n sequences instead of line breaks.
-  if (!source.includes("\n") && /\\r?\\n/.test(source)) {
-    source = source.replace(/\\r?\\n/g, "\n");
+  // Legacy chapter JSON stores newline markers as literal backslash-n characters.
+  if (!source.includes("\n") && /\\r?n/.test(source)) {
+    source = source.replace(/\\r?n/g, "\n");
   }
   // Normalize double-escaped inline KaTeX delimiters.
   source = source.replace(/\\\\([()])/g, "\\$1");
