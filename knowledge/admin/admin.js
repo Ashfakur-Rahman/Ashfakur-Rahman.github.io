@@ -259,7 +259,7 @@ $("new-chapter").onclick = newChapter;
 $("refresh-preview").onclick = updatePreview;
 $("chapter-body").addEventListener("input", () => { chapterDraft[editorLang] = editorContent(); updatePreview(); $("save-state").textContent = "Unsaved changes"; });
 document.querySelectorAll("[data-editor-lang]").forEach(button => button.addEventListener("click", () => {
-  chapterDraft[editorLang] = $("chapter-body").value;
+  chapterDraft[editorLang] = editorContent();
   editorLang = button.dataset.editorLang;
   syncLangTabs();
 }));
