@@ -102,17 +102,15 @@ async function getDraftCatalog(env) {
   let raw = await env.SESSIONS.get(DRAFT_CATALOG_KEY);
   if (raw) return JSON.parse(raw);
   // One-time bootstrap from the existing starter catalog. Subsequent edits stay in KV.
-  const legacy = await readRepoJson(env, "knowledge/content/catalog.json");
-  await env.SESSIONS.put(DRAFT_CATALOG_KEY, JSON.stringify(legacy));
-  return legacy;
+  const initial = { schemaVersion: 1, books: [] };
+  await env.SESSIONS.put(DRAFT_CATALOG_KEY, JSON.stringify(initial));
+  return initial;
 }
 
 async function getDraftChapter(env, slug) {
   let raw = await env.SESSIONS.get(draftChapterKey(slug));
   if (raw) return JSON.parse(raw);
-  const legacy = await readRepoJson(env, "knowledge/content/chapters/" + slug + ".json");
-  await env.SESSIONS.put(draftChapterKey(slug), JSON.stringify(legacy));
-  return legacy;
+  return null;
 }
 
 async function refreshPublishedCatalog(env, draft) {
@@ -167,6 +165,7 @@ async function handleApi(request, env, url) {
     const entry = book && (book.chapters || []).find(item => item.slug === chapterSlug);
     if (!book || !entry) return json({ error: "Book or chapter not found." }, 404);
     const chapter = await getDraftChapter(env, chapterSlug);
+    if (!chapter) return json({ error: "Chapter not found." }, 404);
     if (chapter.book !== bookSlug) return json({ error: "Chapter does not belong to this book." }, 404);
     return json(url.pathname === "/api/preview" ? { preview: true, book, chapter } : { book, chapter });
   }
@@ -205,7 +204,6 @@ async function serveStudio(request, env, url) {
     "/studio/assets/library.css": ["knowledge/assets/library.css", "text/css; charset=utf-8"],
     "/studio/assets/config.js": ["knowledge/assets/config.js", "text/javascript; charset=utf-8"],
     "/studio/assets/reader.js": ["knowledge/assets/reader.js", "text/javascript; charset=utf-8"],
-    "/studio/content/catalog.json": ["knowledge/content/catalog.json", "application/json; charset=utf-8"]
   };
   let entry = routes[url.pathname];
   if (!entry) {
