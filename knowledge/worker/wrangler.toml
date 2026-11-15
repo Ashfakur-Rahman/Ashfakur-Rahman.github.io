@@ -1,0 +1,14 @@
+name = "knowledge-library-auth"
+main = "index.js"
+compatibility_date = "2026-11-14"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "3f757636c0c049848c790ffe46e8f9a1"
+
+[vars]
+GITHUB_OWNER = "Ashfakur-Rahman"
+GITHUB_REPO = "Ashfakur-Rahman.github.io"
+GITHUB_BRANCH = "feature/knowledge-library-foundation"
+ADMIN_GITHUB_LOGIN = "Ashfakur-Rahman"
+OAUTH_CALLBACK_URL = "https://knowledge-library-auth.ashfakurrahman79.workers.dev/auth/callback"
