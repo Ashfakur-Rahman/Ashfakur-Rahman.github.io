@@ -323,6 +323,16 @@ document.querySelectorAll("[data-cmd]").forEach(button => button.addEventListene
     document.execCommand("formatBlock", false, "p");
   } else {
     document.execCommand(command, false, button.dataset.value || null);
+    if (command === "insertUnorderedList" || command === "insertOrderedList") {
+      // Users often type a Markdown marker before pressing the list toolbar.
+      // Remove that literal marker once the browser has created a real list item.
+      editor.querySelectorAll("li").forEach(item => {
+        const first = item.firstChild;
+        if (first && first.nodeType === Node.TEXT_NODE) {
+          first.textContent = first.textContent.replace(/^\\s*(?:[-*+]\\s+|\\d+[.)]\\s+)/, "");
+        }
+      });
+    }
   }
   rememberEditorSelection();
   chapterDraft[editorLang] = editorContent();
