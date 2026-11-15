@@ -288,9 +288,43 @@ function insertHtml(html) {
   chapterDraft[editorLang] = editorContent();
   updatePreview();
 }
+// Preserve the editor selection when a toolbar button is clicked. Without this,
+// the browser may collapse the selection and apply formatting to the wrong text.
+let savedEditorRange = null;
+const editor = $("chapter-body");
+function rememberEditorSelection() {
+  const selection = window.getSelection();
+  if (selection && selection.rangeCount && editor.contains(selection.anchorNode)) {
+    savedEditorRange = selection.getRangeAt(0).cloneRange();
+  }
+}
+editor.addEventListener("keyup", rememberEditorSelection);
+editor.addEventListener("mouseup", rememberEditorSelection);
+editor.addEventListener("input", rememberEditorSelection);
+document.querySelectorAll(".visual-toolbar button").forEach(button => {
+  button.addEventListener("mousedown", event => {
+    event.preventDefault();
+    rememberEditorSelection();
+  });
+});
+function restoreEditorSelection() {
+  editor.focus();
+  if (!savedEditorRange) return;
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(savedEditorRange);
+}
 document.querySelectorAll("[data-cmd]").forEach(button => button.addEventListener("click", () => {
-  $("chapter-body").focus();
-  document.execCommand(button.dataset.cmd, false, button.dataset.value || null);
+  restoreEditorSelection();
+  const command = button.dataset.cmd;
+  if (command === "formatBlock" && (button.dataset.value || "").toLowerCase() === "p") {
+    // Paragraph means plain body text, not inherited bold/italic/code styling.
+    document.execCommand("removeFormat", false, null);
+    document.execCommand("formatBlock", false, "p");
+  } else {
+    document.execCommand(command, false, button.dataset.value || null);
+  }
+  rememberEditorSelection();
   chapterDraft[editorLang] = editorContent();
   updatePreview();
 }));
